@@ -39,7 +39,7 @@ Tooling:
 ```bash
 python tools/gerar-amostras-sinteticas.py   # NF-e + NFC-e variants (contingência, homologação, ISSQN, Latin-1, reforma, troco…)
 python tools/gerar-amostras-transporte.py   # CT-e, MDF-e, events, CT-e OS (refused)
-python tools/gerar-icone.py                 # regenerates the two .ico files
+python tools/gerar-icone.py                 # ICON.png → the two .ico files (10 sizes each)
 pwsh tools/bench/measure-startup.ps1 -Iterations 12
 iscc installer\FiscalDoc.iss                # → installer/saida/ (Inno Setup 6/7)
 ```
@@ -321,6 +321,16 @@ Consequences baked into the code:
   files (dotnet/runtime#78379). Do not enable `PublishReadyToRun` (small apps
   gain nothing, binary grows 2–3×) or NativeAOT/trimming (SDK-blocked for
   WinForms, `NETSDK1175`).
+- **`ICON.png` at the root is the icon's single source.** `tools/gerar-icone.py`
+  reduces it to the ten sizes Windows asks for (16, 20, 24, 32, 40, 48, 64, 96,
+  128, 256) and writes both `.ico` files. Two things in there are not
+  decoration: the reduction runs in **premultiplied alpha**, or every stroke
+  gets a dark fringe from the RGB hiding under transparent pixels; and sizes
+  ≤ 48 are written as **DIB**, ≥ 64 as **PNG**, because the classic Win32 paths
+  still expect DIB in the small sizes. Below 32 px the art's 7,8 % stroke falls
+  under 2 px and area averaging leaves it washed out, so `adensar` gives the
+  alpha back on a taper that reaches 1,0 exactly at 32. Do not hand-edit the
+  `.ico` files — regenerate them.
 - DPI is `PerMonitorV2` via the `ApplicationHighDpiMode` **project property**,
   not the manifest — the WinForms analyzer `WFO0003` treats DPI in the manifest
   as an error.

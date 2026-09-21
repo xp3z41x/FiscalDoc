@@ -24,3 +24,7 @@ TestResults/
 # ignorados numa cópia sem a pasta (ver FatoComCorpusRealAttribute); as
 # amostras sintéticas em tests/Amostras cobrem o resto e são regeráveis.
 Exemplos XML/
+
+# Cache do Python, criado ao importar os scripts de tools/
+__pycache__/
+*.pyc

@@ -24,7 +24,7 @@ bloco `#ifdef Assinar` em `installer/FiscalDoc.iss`). Enquanto não há,
 cada release publica o SHA-256 do arquivo; confira antes de executar:
 
 ```
-Get-FileHash .\FiscalDoc-0.1.0-instalador.exe -Algorithm SHA256
+Get-FileHash .\FiscalDoc-1.0-instalador.exe -Algorithm SHA256
 ```
 
 ## Requisito
@@ -280,7 +280,7 @@ testar. O gerador de transporte não depende de nada e roda sempre.
 ```
 python tools/gerar-amostras-sinteticas.py    variações de NF-e e NFC-e
 python tools/gerar-amostras-transporte.py    CT-e, MDF-e e eventos
-python tools/gerar-icone.py                  ícones do aplicativo
+python tools/gerar-icone.py                  ICON.png → os dois .ico, 10 tamanhos
 pwsh tools/bench/measure-startup.ps1         medição de partida
 ```
 

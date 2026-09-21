@@ -47,7 +47,7 @@
 ; MANTER EM DIA COM <Version> em Directory.Build.props.  Sao duas fontes para
 ; o mesmo numero; divergem no dia em que alguem sobe uma e esquece a outra, e
 ; ai o instalador mente sobre o que instala.
-#define AppVersion     "0.1.0"
+#define AppVersion     "1.0"
 #define AppPublisher   "Bernardo Graunke"
 #define AppExe         "FiscalDoc.exe"
 #define RepoUrl        "https://github.com/xp3z41x/FiscalDoc"
@@ -113,6 +113,12 @@ DisableDirPage=auto
 
 UninstallDisplayName={#AppName}
 UninstallDisplayIcon={app}\{#AppExe}
+
+; Icone do proprio instalador: e o que o Explorer mostra no arquivo baixado e
+; o que aparece na caixa do UAC.  Sem isto o instalador sai com o icone
+; generico do Inno Setup, e um executavel sem cara propria pedindo elevacao e
+; exatamente o que ensinam a nao executar.
+SetupIconFile=..\src\FiscalDoc.App\FiscalDoc.ico
 
 ; Estes tres viram links clicaveis no Painel de Controle.  Ausentes, o painel
 ; simplesmente nao mostra a linha - que e melhor do que um link morto.
