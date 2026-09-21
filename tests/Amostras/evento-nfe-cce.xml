@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<procEventoNFe versao="1.00" xmlns="http://www.portalfiscal.inf.br/nfe">
+<evento versao="1.00"><infEvento Id="ID1101101322233300010700018155002000039167115403410701">
+<cOrgao>41</cOrgao><tpAmb>1</tpAmb><CNPJ>11222333000181</CNPJ>
+<chNFe>13222333000107000181550020000391671152034107</chNFe><dhEvento>2026-09-18T14:32:05-03:00</dhEvento>
+<tpEvento>110110</tpEvento><nSeqEvento>1</nSeqEvento><verEvento>1.00</verEvento>
+<detEvento versao="1.00"><descEvento>Carta de Correcao</descEvento>
+<xCorrecao>TEXTO DE AMOSTRA</xCorrecao>
+<xCondUso>A Carta de Correcao e disciplinada pelo paragrafo 1o-A do art. 7o do Convenio S/N, de 15 de dezembro de 1970 e pode ser utilizada para regularizacao de erro ocorrido na emissao de documento fiscal, desde que o erro nao esteja relacionado com: I - as variaveis que determinam o valor do imposto tais como: base de calculo, aliquota, diferenca de preco, quantidade, valor da operacao ou da prestacao; II - a correcao de dados cadastrais que implique mudanca do remetente ou do destinatario; III - a data de emissao ou de saida.</xCondUso></detEvento></infEvento></evento>
+<retEvento versao="1.00"><infEvento Id="ID110110132223330001070001815500200003916711540341070101">
+<tpAmb>1</tpAmb><verAplic>PR-v1_0_0</verAplic><cOrgao>41</cOrgao>
+<cStat>135</cStat><xMotivo>TEXTO DE AMOSTRA</xMotivo>
+<chNFe>13222333000107000181550020000391671152034107</chNFe><tpEvento>110110</tpEvento><xEvento>Carta de Correcao</xEvento>
+<nSeqEvento>1</nSeqEvento><CNPJDest>12222333000144</CNPJDest>
+<dhRegEvento>2026-09-18T14:32:41-03:00</dhRegEvento>
+<nProt>999999999999990</nProt></infEvento></retEvento>
+</procEventoNFe>

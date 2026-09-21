@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mdfeProc versao="3.00" xmlns="http://www.portalfiscal.inf.br/mdfe">
+<MDFe xmlns="http://www.portalfiscal.inf.br/mdfe"><infMDFe versao="3.00" Id="MDFe41260911222333000181580010000055121334400779">
+<ide><cUF>41</cUF><tpAmb>1</tpAmb><tpEmit>1</tpEmit><tpTransp>1</tpTransp>
+<mod>58</mod><serie>1</serie><nMDF>5512</nMDF><cMDF>33440077</cMDF>
+<cDV>9</cDV><modal>1</modal>
+<dhEmi>2026-09-14T08:40:11-03:00</dhEmi><tpEmis>1</tpEmis>
+<procEmi>0</procEmi><verProc>3.0.2</verProc>
+<UFIni>PR</UFIni><UFFim>SP</UFFim>
+<infMunCarrega><cMunCarrega>4106902</cMunCarrega><xMunCarrega>CURITIBA</xMunCarrega></infMunCarrega>
+<infPercurso><UFPer>SP</UFPer></infPercurso>
+<dhIniViagem>2026-09-14T10:00:00-03:00</dhIniViagem></ide>
+<emit><CNPJ>11222333000181</CNPJ><IE>9999999990</IE>
+<xNome>INDUSTRIA E COMERCIO ZENITE SA</xNome><xFant>ANA PAULA MARTINS</xFant>
+<enderEmit><xLgr>TRAVESSA DO MIRANTE</xLgr><nro>2986</nro><xBairro>CENTRO</xBairro>
+<cMun>4106902</cMun><xMun>CURITIBA</xMun><CEP>99999990</CEP><UF>PR</UF>
+<fone>9999999990</fone></enderEmit></emit>
+<infModal versaoModal="3.00"><rodo>
+<infANTT><RNTRC>12345678</RNTRC></infANTT>
+<veicTracao><cInt>001</cInt><placa>ABC1D23</placa><RENAVAM>00912345678</RENAVAM>
+<tara>7800</tara><capKG>23000</capKG>
+<condutor><xNome>FERNANDA SOUZA ROCHA</xNome><CPF>11144477735</CPF></condutor>
+<condutor><xNome>JULIANA FERREIRA LIMA</xNome><CPF>11244477761</CPF></condutor>
+<tpRod>06</tpRod><tpCar>02</tpCar><UF>PR</UF></veicTracao>
+<veicReboque><cInt>R01</cInt><placa>XYZ9W87</placa><tara>5200</tara>
+<capKG>18000</capKG><tpCar>02</tpCar><UF>PR</UF></veicReboque>
+</rodo></infModal>
+<infDoc><infMunDescarga><cMunDescarga>3550308</cMunDescarga><xMunDescarga>SAO PAULO</xMunDescarga><infNFe><chNFe>41260912222333000144550010002950001200000005</chNFe></infNFe><infNFe><chNFe>41260912222333000144550010002950011200000010</chNFe></infNFe><infNFe><chNFe>41260912222333000144550010002950021200000026</chNFe></infNFe></infMunDescarga><infMunDescarga><cMunDescarga>3509502</cMunDescarga><xMunDescarga>CAMPINAS</xMunDescarga><infNFe><chNFe>41260912222333000144550010002950031200000031</chNFe></infNFe><infNFe><chNFe>41260912222333000144550010002950041200000047</chNFe></infNFe><infNFe><chNFe>41260912222333000144550010002950051200000052</chNFe></infNFe></infMunDescarga><infMunDescarga><cMunDescarga>3543402</cMunDescarga><xMunDescarga>RIBEIRAO PRETO</xMunDescarga><infNFe><chNFe>41260912222333000144550010002950061200000068</chNFe></infNFe><infNFe><chNFe>41260912222333000144550010002950071200000073</chNFe></infNFe><infNFe><chNFe>41260912222333000144550010002950081200000089</chNFe></infNFe></infMunDescarga></infDoc>
+<prodPred><tpCarga>05</tpCarga><xProd>ARTIGO DE AMOSTRA</xProd></prodPred>
+<tot><qNFe>9</qNFe><vCarga>148320.55</vCarga><cUnid>01</cUnid><qCarga>8420.0000</qCarga></tot>
+<lacres><nLacre>LAC0099123</nLacre></lacres>
+<lacres><nLacre>LAC0099124</nLacre></lacres>
+<infAdic><infCpl>TEXTO DE AMOSTRA</infCpl></infAdic>
+</infMDFe></MDFe>
+<protMDFe versao="3.00"><infProt><tpAmb>1</tpAmb><verAplic>PR-v3_0_2</verAplic>
+<chMDFe>41260911222333000181580010000055121334400779</chMDFe><dhRecbto>2026-09-14T08:41:03-03:00</dhRecbto>
+<nProt>999999999999990</nProt><digVal>def456</digVal><cStat>100</cStat>
+<xMotivo>TEXTO DE AMOSTRA</xMotivo></infProt></protMDFe>
+</mdfeProc>

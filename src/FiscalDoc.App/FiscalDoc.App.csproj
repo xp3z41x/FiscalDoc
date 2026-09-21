@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+
+    <!-- A previa e a impressao passam pelo WPF: DirectWrite desenha, XPS
+         imprime. A janela continua WinForms - nao ha App.xaml nem ponto de
+         entrada gerado, dai o EnableDefaultApplicationDefinition. -->
+    <UseWPF>true</UseWPF>
+    <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
+    <AssemblyName>FiscalDoc</AssemblyName>
+
+    <!-- Vira FileDescription no recurso Win32 - a coluna "Descricao" do
+         Explorer e a primeira linha de Propriedades > Detalhes. Estava vazia,
+         e um .exe sem descricao numa pasta de Program Files nao diz a ninguem
+         o que ele e. -->
+    <AssemblyTitle>FiscalDoc — Visualizador de Documentos Fiscais</AssemblyTitle>
+    <RootNamespace>FiscalDoc.App</RootNamespace>
+
+    <!-- O manifesto carrega so longPathAware e o supportedOS. O DPI vem da
+         propriedade abaixo porque o analisador do WinForms (WFO0003) trata DPI
+         no manifesto como erro. Ver plano 3.2. -->
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+
+    <!-- O default do SDK e SystemAware. A superficie de pagina precisa do DPI
+         real do monitor em que esta, entao PerMonitorV2 e obrigatorio aqui. -->
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+
+    <!-- Sem processo residente, sem updater, sem nada em segundo plano. -->
+    <SelfContained>false</SelfContained>
+
+    <!-- Icone do aplicativo, embutido no .exe como indice 0. -->
+    <ApplicationIcon>FiscalDoc.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <!-- Icone de DOCUMENTO, para a associacao de .xml. Vai como arquivo ao lado
+       do executavel porque o MSBuild so embute um grupo de icone (o
+       ApplicationIcon). Embutir os dois exigiria um .rc e o rc.exe do SDK do
+       Windows, o que traria uma dependencia de build so por causa disso. -->
+  <ItemGroup>
+    <None Include="FiscalDocDocumento.ico" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!-- A suite enxerga o interno do App. Sem isto, a escolha de papel e o
+       roteamento de layout - duas regras que o CLAUDE.md declara e que
+       quebraram de verdade - ficariam sem teste nenhum. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="FiscalDoc.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FiscalDoc.Core\FiscalDoc.Core.csproj" />
+    <ProjectReference Include="..\FiscalDoc.Layout\FiscalDoc.Layout.csproj" />
+    <ProjectReference Include="..\FiscalDoc.Render.Wpf\FiscalDoc.Render.Wpf.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+
+    <!-- So o WPF. Este projeto NAO referencia System.Drawing: aqui moram o
+         unico reprodutor da display list e a unica medicao de texto do
+         aplicativo, os dois sobre DirectWrite. Ver RenderizadorWpf. -->
+    <UseWPF>true</UseWPF>
+
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FiscalDoc.Layout\FiscalDoc.Layout.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,13 @@
+# Normaliza a quebra de linha no repositório (LF) e deixa o checkout usar a
+# convenção da plataforma. Sem isto, um clone em Linux ou macOS veria o
+# arquivo inteiro como alterado.
+* text=auto
+
+# Binários: nunca converter.
+*.ico   binary
+*.png   binary
+*.pfx   binary
+
+# XML de documento fiscal: o conteúdo é assinado digitalmente na origem.
+# Converter quebra de linha alteraria os bytes e invalidaria a assinatura.
+*.xml   -text

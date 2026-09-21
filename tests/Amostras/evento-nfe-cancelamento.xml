@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<procEventoNFe versao="1.00" xmlns="http://www.portalfiscal.inf.br/nfe">
+<evento versao="1.00"><infEvento Id="ID1101111222233300014400018155002000039168115503411201">
+<cOrgao>41</cOrgao><tpAmb>1</tpAmb><CNPJ>11222333000181</CNPJ>
+<chNFe>12222333000144000181550020000391681152034112</chNFe><dhEvento>2026-09-18T16:10:00-03:00</dhEvento>
+<tpEvento>110111</tpEvento><nSeqEvento>1</nSeqEvento><verEvento>1.00</verEvento>
+<detEvento versao="1.00"><descEvento>Cancelamento</descEvento>
+<nProt>999999999999990</nProt>
+<xJust>TEXTO DE AMOSTRA</xJust>
+</detEvento></infEvento></evento>
+<retEvento versao="1.00"><infEvento Id="ID110111122223330001440001815500200003916811550341120101">
+<tpAmb>1</tpAmb><verAplic>PR-v1_0_0</verAplic><cOrgao>41</cOrgao>
+<cStat>135</cStat><xMotivo>TEXTO DE AMOSTRA</xMotivo>
+<chNFe>12222333000144000181550020000391681152034112</chNFe><tpEvento>110111</tpEvento><xEvento>Cancelamento</xEvento>
+<nSeqEvento>1</nSeqEvento><dhRegEvento>2026-09-18T16:10:22-03:00</dhRegEvento>
+<nProt>999999999999990</nProt></infEvento></retEvento>
+</procEventoNFe>

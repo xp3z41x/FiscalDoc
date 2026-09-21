@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- TFM neutro: o layout produz uma display list em milimetros e nunca toca
+       num Graphics. A medicao de texto entra por ITextMeasurer, implementada
+       em FiscalDoc.Render.Wpf. Ver plano 2.1 e 2.5. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FiscalDoc.Core\FiscalDoc.Core.csproj" />
+  </ItemGroup>
+
+</Project>

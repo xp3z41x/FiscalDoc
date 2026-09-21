@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FiscalDoc.App/FiscalDoc.App.csproj" />
+    <Project Path="src/FiscalDoc.Core/FiscalDoc.Core.csproj" />
+    <Project Path="src/FiscalDoc.Layout/FiscalDoc.Layout.csproj" />
+    <Project Path="src/FiscalDoc.Render.Wpf/FiscalDoc.Render.Wpf.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FiscalDoc.Tests/FiscalDoc.Tests.csproj" />
+  </Folder>
+</Solution>

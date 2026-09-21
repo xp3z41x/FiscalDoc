@@ -1,0 +1,26 @@
+# Saída de compilação
+bin/
+obj/
+
+# Saída do instalador
+installer/saida/
+
+# PNGs de conferência visual, regerados pela suíte de testes
+tests/Saida/
+
+# Resultados de teste
+TestResults/
+*.trx
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.user
+
+# Corpus real de conferência — NÃO vai para o repositório.
+# São notas fiscais emitidas de verdade: CPF e nome completo de 8 pessoas,
+# CNPJ, endereço, telefone e dado comercial de 22 empresas. Dado pessoal de
+# terceiro não é nosso para publicar. Os testes que dependem dele se declaram
+# ignorados numa cópia sem a pasta (ver FatoComCorpusRealAttribute); as
+# amostras sintéticas em tests/Amostras cobrem o resto e são regeráveis.
+Exemplos XML/

@@ -1,0 +1,38 @@
+<Project>
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <NeutralLanguage>pt-BR</NeutralLanguage>
+
+    <!-- Sem R2R: a documentacao oficial e explicita que apps com pouco codigo
+         nao ganham com R2R porque as bibliotecas do .NET ja vem pre-compiladas.
+         Habilitar so inflaria o binario 2-3x. Ver plano 1.3. -->
+    <PublishReadyToRun>false</PublishReadyToRun>
+
+    <!-- NativeAOT e trimming sao bloqueados pelo SDK para WinForms (NETSDK1175).
+         Registrado aqui para que ninguem tente habilitar sem ler o plano 1.2. -->
+    <PublishAot>false</PublishAot>
+    <PublishTrimmed>false</PublishTrimmed>
+
+    <!-- Identidade. Estes campos viram o recurso de versao do Win32 dentro do
+         .exe: e o que o Explorer mostra na coluna Descricao, o que aparece em
+         Propriedades > Detalhes, e o que o Painel de Controle le. Campo vazio
+         num executavel que pede elevacao e a primeira coisa que a TI de um
+         escritorio estranha. -->
+    <Version>0.1.0</Version>
+    <Company>Bernardo Graunke</Company>
+    <Product>FiscalDoc</Product>
+    <Authors>Bernardo Graunke</Authors>
+    <Copyright>© 2026 Bernardo Graunke — Licença MIT</Copyright>
+    <Description>Visualizador e impressor de documentos fiscais eletrônicos brasileiros (NF-e, NFC-e, CT-e e MDF-e).</Description>
+
+    <!-- Identificador SPDX. E o que ferramenta de inventario de licenca le. -->
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/xp3z41x/fiscaldoc</PackageProjectUrl>
+  </PropertyGroup>
+
+</Project>

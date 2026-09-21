@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cteOSProc versao="4.00" xmlns="http://www.portalfiscal.inf.br/cte"><CTeOS versao="4.00"><infCte versao="4.00" Id="CTe41260311222333000181670010000007711551208430">
+<ide><cUF>41</cUF><cCT>55120843</cCT><CFOP>5932</CFOP><natOp>TRANSPORTE DE PESSOAS</natOp>
+<mod>67</mod><serie>1</serie><nCT>771</nCT><dhEmi>2026-03-12T09:20:00-03:00</dhEmi>
+<tpImp>1</tpImp><tpEmis>1</tpEmis><cDV>0</cDV><tpAmb>1</tpAmb><tpCTe>0</tpCTe>
+<procEmi>0</procEmi><verProc>1.0</verProc><cMunEnv>4106902</cMunEnv><xMunEnv>Curitiba</xMunEnv>
+<UFEnv>PR</UFEnv><modal>01</modal><tpServ>6</tpServ><indIEToma>1</indIEToma></ide>
+<emit><CNPJ>11222333000181</CNPJ><IE>9999999990</IE><xNome>INDUSTRIA MERIDIANO SA</xNome>
+<enderEmit><xLgr>AVENIDA DOS IPES</xLgr><nro>500</nro><xBairro>VILA UNIAO</xBairro>
+<cMun>4106902</cMun><xMun>Curitiba</xMun><CEP>99999990</CEP><UF>PR</UF></enderEmit></emit>
+<vPrest><vTPrest>320.00</vTPrest><vRec>320.00</vRec></vPrest>
+</infCte></CTeOS></cteOSProc>
