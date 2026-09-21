@@ -35,6 +35,20 @@
     <ApplicationIcon>FiscalDoc.ico</ApplicationIcon>
   </PropertyGroup>
 
+  <!-- O MESMO arquivo, tambem como recurso gerenciado - e nao e redundancia.
+       O ApplicationIcon acima vira recurso Win32 e responde pela cara do
+       ARQUIVO: Explorer, menu Iniciar, atalho fixado. A cara da JANELA (barra
+       de titulo, Alt+Tab, botao da barra de tarefas) vem de Form.Icon, que o
+       WinForms preenche com o seu wfc.ico generico enquanto ninguem atribuir
+       outro - ver MainForm.CarregarIcone.
+
+       LogicalName fixa o nome pelo qual o codigo pede o recurso; sem ele o
+       nome seria montado a partir de RootNamespace, e renomear o namespace
+       quebraria a leitura em tempo de execucao, nao na compilacao. -->
+  <ItemGroup>
+    <EmbeddedResource Include="FiscalDoc.ico" LogicalName="FiscalDoc.ico" />
+  </ItemGroup>
+
   <!-- Icone de DOCUMENTO, para a associacao de .xml. Vai como arquivo ao lado
        do executavel porque o MSBuild so embute um grupo de icone (o
        ApplicationIcon). Embutir os dois exigiria um .rc e o rc.exe do SDK do

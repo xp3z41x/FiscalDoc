@@ -4,18 +4,24 @@ Gera os icones do aplicativo a partir de ICON.png, na raiz do projeto.
     ICON.png (512x512 RGBA)
         -> src/FiscalDoc.App/FiscalDoc.ico            icone do APLICATIVO
         -> src/FiscalDoc.App/FiscalDocDocumento.ico   icone do DOCUMENTO
+        -> installer/imagens/assistente-NN.bmp        assistente do INSTALADOR
 
-Os dois saem da mesma arte. O ICON.png ja E um documento, entao serve as duas
+Os tres saem da mesma arte. O ICON.png ja E um documento, entao serve as duas
 associacoes: o aplicativo na barra de tarefas e no menu Iniciar, e o .xml que
 ele abre no Explorer. Se algum dia forem arte diferente, e so trocar a origem
 de `DOCUMENTO` aqui embaixo - o resto do script nao muda.
 
-O aplicativo embute o seu como recurso Win32 (`ApplicationIcon` no .csproj); o
-do documento vai como arquivo ao lado do executavel, porque o MSBuild so embute
-UM grupo de icone. O instalador aponta o registro para os dois:
+O aplicativo embute o seu como recurso Win32 (`ApplicationIcon` no .csproj) E
+como recurso gerenciado (`EmbeddedResource`), porque sao duas caras
+diferentes: o recurso Win32 e a cara do ARQUIVO no Explorer, e o gerenciado e
+a cara da JANELA, que o WinForms so poe se alguem atribuir `Form.Icon`. O
+icone do documento vai como arquivo ao lado do executavel, porque o MSBuild so
+embute UM grupo de icone. O instalador aponta o registro para os dois:
 
     Applications\\FiscalDoc.exe\\DefaultIcon  ->  {app}\\FiscalDoc.exe,0
     FiscalDoc.Document.1\\DefaultIcon         ->  {app}\\FiscalDocDocumento.ico
+
+e usa o proprio .ico no `SetupIconFile` e os .bmp no `WizardSmallImageFile`.
 
 Uso:  python tools/gerar-icone.py
 
@@ -53,6 +59,7 @@ import zlib
 RAIZ = pathlib.Path(__file__).resolve().parent.parent
 ORIGEM = RAIZ / "ICON.png"
 DESTINO = RAIZ / "src" / "FiscalDoc.App"
+DESTINO_ASSISTENTE = RAIZ / "installer" / "imagens"
 
 # O conjunto que o Windows pede de fato:
 #   16   lista, detalhes, barra de titulo
@@ -69,6 +76,12 @@ TAMANHOS = [16, 20, 24, 32, 40, 48, 64, 96, 128, 256]
 
 # Abaixo deste limite a entrada sai em DIB; deste tamanho para cima, em PNG.
 LIMITE_PNG = 64
+
+# A imagem que o Inno Setup desenha no alto de TODA pagina do assistente. Ele
+# nao aceita PNG nem ICO ali - so .bmp - e escolhe, da lista que receber, a
+# que melhor serve a escala do monitor: 55 px e a medida a 100 %, 83 a 150 %,
+# 110 a 200 %. Dar os tres evita que ele estique um unico arquivo.
+TAMANHOS_ASSISTENTE = [55, 83, 110]
 
 
 # ---------------------------------------------------------------------
@@ -359,6 +372,62 @@ def montar_ico(entradas: list[tuple[int, bytes]], destino: pathlib.Path) -> None
 
 
 # ---------------------------------------------------------------------
+#  BMP (assistente do instalador)
+# ---------------------------------------------------------------------
+
+
+def bmp(pixels: bytearray, lado: int) -> bytes:
+    """
+    BMP de 32 bits, de baixo para cima, com alfa PREMULTIPLICADO.
+
+    <para>O Inno Setup so aceita .bmp nas imagens do assistente. O fundo da
+    arte e transparente, e o unico jeito de manter isso num BMP e o canal
+    alfa - com `WizardImageAlphaFormat=premultiplied` no script do
+    instalador. Sem o par, o alfa e ignorado e cada pixel transparente
+    aparece com o RGB que se esconde sob ele, que neste PNG e preto: um
+    quadrado preto em volta do desenho.</para>
+
+    <para>Cabecalho classico de 40 bytes e BI_RGB, e nao BITFIELDS nem V5: o
+    carregador do Inno (VCL) so reconhece o canal alfa na forma simples, e um
+    cabecalho estendido faz a imagem cair para 24 bits sem aviso.</para>
+    """
+    corpo = bytearray()
+
+    for y in range(lado - 1, -1, -1):
+        base = y * lado * 4
+        for x in range(lado):
+            i = base + x * 4
+            a = pixels[i + 3]
+            corpo += bytes(
+                (
+                    pixels[i + 2] * a // 255,
+                    pixels[i + 1] * a // 255,
+                    pixels[i] * a // 255,
+                    a,
+                )
+            )
+
+    info = struct.pack(
+        "<IiiHHIIiiII",
+        40,          # tamanho do cabecalho
+        lado,        # largura
+        lado,        # altura positiva: linhas de baixo para cima
+        1,           # planos
+        32,          # bits por pixel
+        0,           # BI_RGB, sem compressao
+        len(corpo),
+        2835, 2835,  # ~72 dpi nos dois eixos
+        0, 0,        # sem paleta
+    )
+
+    arquivo = struct.pack(
+        "<2sIHHI", b"BM", 14 + len(info) + len(corpo), 0, 0, 14 + len(info)
+    )
+
+    return arquivo + info + corpo
+
+
+# ---------------------------------------------------------------------
 
 
 def main() -> None:
@@ -388,6 +457,16 @@ def main() -> None:
         caminho = DESTINO / nome
         montar_ico(entradas, caminho)
         print(f"{nome}: {caminho.stat().st_size:,} bytes, {len(entradas)} tamanhos")
+
+    # Nenhum `adensar` aqui: a partir de 32 px o traco ja tem largura de sobra,
+    # e o ganho seria negativo de qualquer forma.
+    DESTINO_ASSISTENTE.mkdir(parents=True, exist_ok=True)
+
+    for lado in TAMANHOS_ASSISTENTE:
+        dados = bmp(reduzir(pixels, largura, lado), lado)
+        caminho = DESTINO_ASSISTENTE / f"assistente-{lado}.bmp"
+        caminho.write_bytes(dados)
+        print(f"{caminho.name}: {len(dados):,} bytes, {lado}x{lado} BMP 32 bits")
 
 
 if __name__ == "__main__":

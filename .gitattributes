@@ -6,6 +6,7 @@
 # Binários: nunca converter.
 *.ico   binary
 *.png   binary
+*.bmp   binary
 *.pfx   binary
 
 # XML de documento fiscal: o conteúdo é assinado digitalmente na origem.

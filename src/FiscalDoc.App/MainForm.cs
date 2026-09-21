@@ -39,6 +39,7 @@ internal sealed class MainForm : Form
     internal MainForm(string? caminhoInicial)
     {
         Text = Mensagens.TituloJanela;
+        Icon = CarregarIcone();
         ClientSize = new Size(1000, 780);
         StartPosition = FormStartPosition.CenterScreen;
         MinimumSize = new Size(560, 400);
@@ -79,6 +80,40 @@ internal sealed class MainForm : Form
             Abrir(_caminhoInicial);
         }
     }
+
+    /// <summary>
+    /// O icone da JANELA: barra de titulo, Alt+Tab e botao da barra de
+    /// tarefas.
+    ///
+    /// <para>Nao vem de graca do <c>ApplicationIcon</c>. Aquele e recurso
+    /// Win32 do executavel e responde pelo ARQUIVO, no Explorer; a janela usa
+    /// <see cref="Form.Icon"/>, e enquanto ninguem atribui nada o WinForms
+    /// devolve o <c>wfc.ico</c> dele - o quadradinho branco generico de
+    /// formulario. O aplicativo ficava com dois rostos: o certo no atalho, o
+    /// do framework onde o usuario passa o dia olhando.</para>
+    ///
+    /// <para>Vai o arquivo .ico INTEIRO, com os dez tamanhos, porque o
+    /// WinForms escolhe dele um quadro para o icone grande (Alt+Tab) e outro
+    /// para o pequeno (barra de titulo). Extrair do proprio .exe com
+    /// <c>Icon.ExtractAssociatedIcon</c> traria um unico quadro de 32 px, e o
+    /// de 16 sairia de uma reducao em tempo de execucao - que e exatamente o
+    /// que <c>tools/gerar-icone.py</c> existe para evitar.</para>
+    /// </summary>
+    private static Icon CarregarIcone()
+    {
+        using var fluxo = typeof(MainForm).Assembly
+            .GetManifestResourceStream(RecursoIcone);
+
+        // So acontece se alguem tirar o EmbeddedResource do .csproj. Melhor
+        // parar aqui, onde a mensagem diz o que falta, do que sair com o
+        // icone generico e ninguem reparar.
+        return fluxo is null
+            ? throw new InvalidOperationException(
+                $"recurso embutido ausente: {RecursoIcone}")
+            : new Icon(fluxo);
+    }
+
+    private const string RecursoIcone = "FiscalDoc.ico";
 
     private void MontarBarra()
     {

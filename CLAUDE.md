@@ -39,7 +39,7 @@ Tooling:
 ```bash
 python tools/gerar-amostras-sinteticas.py   # NF-e + NFC-e variants (contingência, homologação, ISSQN, Latin-1, reforma, troco…)
 python tools/gerar-amostras-transporte.py   # CT-e, MDF-e, events, CT-e OS (refused)
-python tools/gerar-icone.py                 # ICON.png → the two .ico files (10 sizes each)
+python tools/gerar-icone.py                 # ICON.png → the two .ico (10 sizes each) + the wizard .bmp
 pwsh tools/bench/measure-startup.ps1 -Iterations 12
 iscc installer\FiscalDoc.iss                # → installer/saida/ (Inno Setup 6/7)
 ```
@@ -114,8 +114,10 @@ still a coupon.
 `net10.0-windows`. They therefore *cannot* reference `System.Drawing` even by
 accident. **Do not change these TFMs.** When Layout needs text metrics it goes
 through `IMedidorTexto`, implemented in Render.Wpf. `FiscalDoc.Render.Wpf`
-does not reference `System.Drawing` at all. The only `System.Drawing` left in
-the app is the WinForms surface that holds the preview bitmap and blits it.
+does not reference `System.Drawing` at all. The only `System.Drawing` that
+*draws* anything in the app is the WinForms surface that holds the preview
+bitmap and blits it; the one other appearance is `MainForm.Icon`, which the
+WinForms API types as `System.Drawing.Icon` and which paints no document.
 
 ### Why a display list instead of drawing directly
 
@@ -219,7 +221,7 @@ These were each learned from a real bug. Changing them silently breaks output.
   `GraphicsUnit.Pixel`.** `DrawImageUnscaled` draws by the image's *physical*
   size: let the bitmap's stored DPI drift from the destination `Graphics` DPI
   and GDI+ silently resamples the whole sheet. This is the one place
-  `System.Drawing` still appears, and only to move pixels to the window.
+  `System.Drawing` still *draws*, and only to move pixels to the window.
 - **Do not tune geometry by eye from the preview.** It rasterises at 96–192 dpi
   while print is 600+; hairlines and barcode modules look wrong there even when
   the paper is correct.
@@ -323,14 +325,29 @@ Consequences baked into the code:
   WinForms, `NETSDK1175`).
 - **`ICON.png` at the root is the icon's single source.** `tools/gerar-icone.py`
   reduces it to the ten sizes Windows asks for (16, 20, 24, 32, 40, 48, 64, 96,
-  128, 256) and writes both `.ico` files. Two things in there are not
+  128, 256), writes both `.ico` files, and writes the installer wizard's
+  `installer/imagens/assistente-{55,83,110}.bmp`. Three things in there are not
   decoration: the reduction runs in **premultiplied alpha**, or every stroke
-  gets a dark fringe from the RGB hiding under transparent pixels; and sizes
+  gets a dark fringe from the RGB hiding under transparent pixels; sizes
   ≤ 48 are written as **DIB**, ≥ 64 as **PNG**, because the classic Win32 paths
-  still expect DIB in the small sizes. Below 32 px the art's 7,8 % stroke falls
-  under 2 px and area averaging leaves it washed out, so `adensar` gives the
-  alpha back on a taper that reaches 1,0 exactly at 32. Do not hand-edit the
-  `.ico` files — regenerate them.
+  still expect DIB in the small sizes; and the BMPs carry **premultiplied
+  alpha with a plain 40-byte BI_RGB header**, which is the only form Inno's
+  loader reads as 32-bit — paired with `WizardImageAlphaFormat=premultiplied`
+  in the `.iss`, or the transparent background prints as a black square.
+  Below 32 px the art's 7,8 % stroke falls under 2 px and area averaging
+  leaves it washed out, so `adensar` gives the alpha back on a taper that
+  reaches 1,0 exactly at 32. Do not hand-edit the generated files —
+  regenerate them.
+- **The icon has to be applied in two channels, not one.** `ApplicationIcon`
+  gives the *file* a face (Explorer, Start menu, pinned shortcut); the
+  *window* — title bar, Alt+Tab, taskbar button — reads `Form.Icon`, and
+  WinForms fills that with its own generic `wfc.ico` unless something assigns
+  it. So the same `FiscalDoc.ico` is also an `EmbeddedResource` and
+  `MainForm.CarregarIcone` loads it whole, letting WinForms pick a real frame
+  for each of the two sizes instead of downscaling one at run time. Shipping
+  only the first channel is exactly the defect this file exists to prevent
+  repeating: the app had two faces, the right one on the shortcut and the
+  framework's on screen.
 - DPI is `PerMonitorV2` via the `ApplicationHighDpiMode` **project property**,
   not the manifest — the WinForms analyzer `WFO0003` treats DPI in the manifest
   as an error.
@@ -341,13 +358,14 @@ Consequences baked into the code:
   default-app changes since Windows 8 (UCPD.sys).
 - The app writes nothing to its install directory at run time — no config, no
   log, no cache. That is what makes read-only Program Files viable; keep it so.
-- **Identity metadata lives in two files and they must agree.**
+- **Identity metadata lives in three files and they must agree.**
   `Directory.Build.props` holds `Version`, `Company`, `Product`, `Authors`,
   `Copyright` and `Description` — these become the Win32 version resource, i.e.
   what Explorer's Description column, Properties > Details and Control Panel
   read. `installer/FiscalDoc.iss` repeats the version in `#define AppVersion`
-  and the publisher in `#define AppPublisher`. There is no build step linking
-  them; bump one, bump the other.
+  and the publisher in `#define AppPublisher`. `src/FiscalDoc.App/app.manifest`
+  repeats it a third time in `assemblyIdentity version`, which needs four
+  parts. There is no build step linking them; bump one, bump all.
 - **Licence: MIT, Bernardo Graunke.** `LICENSE` at the root, `LicenseFile` in
   the installer wizard, and a copy installed into `{app}` — MIT requires the
   notice to travel with every copy, and nobody who inherits a configured

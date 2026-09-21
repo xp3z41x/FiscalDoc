@@ -120,6 +120,25 @@ UninstallDisplayIcon={app}\{#AppExe}
 ; exatamente o que ensinam a nao executar.
 SetupIconFile=..\src\FiscalDoc.App\FiscalDoc.ico
 
+; A mesma arte no alto de TODA pagina do assistente.  Ausente, o Inno Setup
+; desenha a marca dele - e quem esta instalando o FiscalDoc passa o assistente
+; inteiro olhando o logotipo de outro programa.
+;
+; Os tres arquivos sao a MESMA imagem em tres medidas, e o Inno escolhe a que
+; serve a escala do monitor (55 px a 100 %, 83 a 150 %, 110 a 200 %) em vez de
+; esticar uma so.  Saem de tools/gerar-icone.py, do mesmo ICON.png.
+;
+; A imagem GRANDE - a faixa vertical de 164x314 da ultima pagina - continua
+; sendo a do Inno de proposito: a arte e quadrada, e esticada para aquela
+; proporcao sairia deformada.
+WizardSmallImageFile=imagens\assistente-55.bmp,imagens\assistente-83.bmp,imagens\assistente-110.bmp
+
+; O fundo do desenho e transparente, e num BMP isso so existe como canal alfa.
+; Sem esta linha o Inno ignora o alfa e desenha o RGB que se esconde sob os
+; pixels transparentes - que neste PNG e preto: um quadrado preto em volta do
+; icone.  Os arquivos ja saem premultiplicados do gerador.
+WizardImageAlphaFormat=premultiplied
+
 ; Estes tres viram links clicaveis no Painel de Controle.  Ausentes, o painel
 ; simplesmente nao mostra a linha - que e melhor do que um link morto.
 AppPublisherURL={#RepoUrl}

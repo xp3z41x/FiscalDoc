@@ -1,3 +1,5 @@
+<img src="ICON.png" alt="" width="96">
+
 # FiscalDoc
 
 Visualizador e impressor de documentos fiscais eletrônicos brasileiros.
@@ -280,7 +282,7 @@ testar. O gerador de transporte não depende de nada e roda sempre.
 ```
 python tools/gerar-amostras-sinteticas.py    variações de NF-e e NFC-e
 python tools/gerar-amostras-transporte.py    CT-e, MDF-e e eventos
-python tools/gerar-icone.py                  ICON.png → os dois .ico, 10 tamanhos
+python tools/gerar-icone.py                  ICON.png → os dois .ico e o assistente
 pwsh tools/bench/measure-startup.ps1         medição de partida
 ```
 
