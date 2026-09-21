@@ -12,6 +12,21 @@ estado, sem nada em segundo plano.
 | MDF-e modelo 58 (3.00) | DAMDFE, A4 | Blocos do MOC; ver *Fidelidade* |
 | Eventos de NF-e, CT-e e MDF-e | Desenho próprio, A4 | Não há norma; ver *Fidelidade* |
 
+## Baixar
+
+O instalador está em **[Releases](https://github.com/xp3z41x/FiscalDoc/releases)**.
+
+**O instalador não é assinado.** O SmartScreen mostra *"O Windows protegeu o seu
+PC"* e o UAC diz **Editor: Desconhecido**. Para prosseguir: *Mais informações* ›
+*Executar assim mesmo*. Isso não é descuido — é o que custa um certificado de
+assinatura de código, e o instalador já está preparado para usar um (veja o
+bloco `#ifdef Assinar` em `installer/FiscalDoc.iss`). Enquanto não há,
+cada release publica o SHA-256 do arquivo; confira antes de executar:
+
+```
+Get-FileHash .\FiscalDoc-0.1.0-instalador.exe -Algorithm SHA256
+```
+
 ## Requisito
 
 **.NET 10 Desktop Runtime (x64).** O aplicativo é framework-dependent de

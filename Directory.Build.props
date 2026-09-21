@@ -32,7 +32,7 @@
 
     <!-- Identificador SPDX. E o que ferramenta de inventario de licenca le. -->
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/xp3z41x/fiscaldoc</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/xp3z41x/FiscalDoc</PackageProjectUrl>
   </PropertyGroup>
 
 </Project>

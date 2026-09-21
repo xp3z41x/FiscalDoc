@@ -50,7 +50,7 @@
 #define AppVersion     "0.1.0"
 #define AppPublisher   "Bernardo Graunke"
 #define AppExe         "FiscalDoc.exe"
-#define RepoUrl        "https://github.com/xp3z41x/fiscaldoc"
+#define RepoUrl        "https://github.com/xp3z41x/FiscalDoc"
 #define ProgId         "FiscalDoc.Document.1"
 
 ; Chave do registro sob HKLM\Software.  Separada de AppPublisher porque o nome
