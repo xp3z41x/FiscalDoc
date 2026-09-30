@@ -29,7 +29,7 @@
 <xBairro>JARDIM NOVO</xBairro><cMun>3550308</cMun><xMun>SAO PAULO</xMun>
 <CEP>99999990</CEP><UF>SP</UF><cPais>1058</cPais><xPais>BRASIL</xPais></enderDest></dest>
 <vPrest><vTPrest>180.00</vTPrest><vRec>180.00</vRec>
-<Comp><xNome>DIFERENCA DE FRETE</xNome><vComp>180.00</vComp></Comp></vPrest>
+<Comp><xNome>DIFERENCA FRETE</xNome><vComp>180.00</vComp></Comp></vPrest>
 <imp><ICMS><ICMS00><CST>00</CST><vBC>180.00</vBC><pICMS>12.00</pICMS><vICMS>21.60</vICMS></ICMS00></ICMS><vTotTrib>34.20</vTotTrib></imp>
 <infCteComp><chCTe>41260911222333000181570010000917231741146435</chCTe></infCteComp>
 <infCteComp><chCTe>41260911222333000181570010000917241741146440</chCTe></infCteComp>

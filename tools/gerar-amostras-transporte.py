@@ -70,10 +70,16 @@ def cte(versao: str, nome: str, *, componentes: int, documentos: int,
         f"<infNFe><chave>{chave('41', '2609', '12222333000148', '55', 1, 294000 + i, '1', 10000000 + i)}</chave></infNFe>"
         for i in range(documentos))
 
+    # dhCont e xJust vem depois de toma3/toma4 - e nao ao lado de tpEmis,
+    # onde o schema os recusa.
     cont = ""
     if tpemis in ("5", "7"):
         cont = ("<dhCont>2026-09-14T07:22:00-03:00</dhCont>"
                 "<xJust>Indisponibilidade do ambiente autorizador da SEFAZ de origem</xJust>")
+
+    # CRT e obrigatorio no emit do CT-e 4.00. No 3.00 so apareceu com o pacote
+    # 3.00a (NT 2022.001), e opcional: a amostra 3.00 fica sem ele.
+    crt = "<CRT>3</CRT>" if versao == "4.00" else ""
 
     escrever(nome, f"""<?xml version="1.0" encoding="UTF-8"?>
 <cteProc versao="{versao}" xmlns="{NS_CTE}">
@@ -83,19 +89,19 @@ def cte(versao: str, nome: str, *, componentes: int, documentos: int,
 <mod>57</mod><serie>1</serie><nCT>91723</nCT>
 <dhEmi>2026-09-14T09:18:37-03:00</dhEmi><tpImp>2</tpImp><tpEmis>{tpemis}</tpEmis>
 <cDV>{ch[-1]}</cDV><tpAmb>{tpamb}</tpAmb><tpCTe>0</tpCTe><procEmi>0</procEmi>
-<verProc>4.0.7</verProc>{cont}
+<verProc>4.0.7</verProc>
 <cMunEnv>4106902</cMunEnv><xMunEnv>CURITIBA</xMunEnv><UFEnv>PR</UFEnv>
 <modal>01</modal><tpServ>0</tpServ>
 <cMunIni>4106902</cMunIni><xMunIni>CURITIBA</xMunIni><UFIni>PR</UFIni>
 <cMunFim>3550308</cMunFim><xMunFim>SAO PAULO</xMunFim><UFFim>SP</UFFim>
 <retira>1</retira><indIEToma>1</indIEToma>
-<toma3><toma>3</toma></toma3></ide>
+<toma3><toma>3</toma></toma3>{cont}</ide>
 <compl><xObs>Mercadoria acondicionada em paletes. Entrega somente em horario comercial.</xObs></compl>
 <emit><CNPJ>11222333000181</CNPJ><IE>9058250705</IE>
 <xNome>TRANSPORTADORA CAMINHO CERTO LTDA</xNome><xFant>CAMINHO CERTO</xFant>
 <enderEmit><xLgr>RUA FRANCISCO DEROSSO</xLgr><nro>2986</nro><xBairro>XAXIM</xBairro>
 <cMun>4106902</cMun><xMun>CURITIBA</xMun><CEP>81720000</CEP><UF>PR</UF>
-<fone>4130916500</fone></enderEmit></emit>
+<fone>4130916500</fone></enderEmit>{crt}</emit>
 <rem><CNPJ>12222333000148</CNPJ><IE>0100007007</IE>
 <xNome>RINALDI S/A IND. PNEUMATICOS</xNome><fone>5434557500</fone>
 <enderReme><xLgr>RUA LUIZ ALEGRETTI</xLgr><nro>193</nro><xBairro>LICORSUL</xBairro>
@@ -272,7 +278,8 @@ def cte_subcontratacao(nome: str) -> None:
     documento de transporte anterior, cobranca, ordens de coleta, previsao de
     entrega e de fluxo, caracteristicas adicionais, campos livres e IBS/CBS.
     """
-    compl = """<compl><xCaracAd>CARGA PALETIZADA</xCaracAd><xCaracSer>ENTREGA AGENDADA</xCaracSer>
+    # xCaracAd vai ate 15 caracteres; xCaracSer, ate 30.
+    compl = """<compl><xCaracAd>PALETIZADA</xCaracAd><xCaracSer>ENTREGA AGENDADA</xCaracSer>
 <fluxo><xOrig>CWB</xOrig><pass><xPass>JVE</xPass></pass><pass><xPass>REG</xPass></pass><xDest>CPQ</xDest><xRota>R12</xRota></fluxo>
 <Entrega><comData><tpPer>2</tpPer><dProg>2026-09-19</dProg></comData><noInter><tpHor>4</tpHor><hIni>08:00:00</hIni><hFim>12:00:00</hFim></noInter></Entrega>
 <xObs>Mercadoria acondicionada em paletes.</xObs>
@@ -296,7 +303,9 @@ def cte_subcontratacao(nome: str) -> None:
     occ = f"""<occ><serie>1</serie><nOcc>55821</nOcc><dEmi>2026-09-12</dEmi><emiOcc><CNPJ>{CNPJ_REM}</CNPJ>
 <cInt>COL-7</cInt><IE>0100007007</IE><UF>RS</UF><fone>5434557500</fone></emiOcc></occ>"""
 
-    cobr = """<cobr><fat><nFat>91724</nFat><vOrig>2202.10</vOrig><vDesc>0.00</vDesc><vLiq>2202.10</vLiq></fat>
+    # Sem vDesc: os valores do fat sao TDec_1302Opc, que nao admite zero -
+    # desconto que nao houve nao se informa.
+    cobr = """<cobr><fat><nFat>91724</nFat><vOrig>2202.10</vOrig><vLiq>2202.10</vLiq></fat>
 <dup><nDup>001</nDup><dVenc>2026-10-14</dVenc><vDup>1101.05</vDup></dup>
 <dup><nDup>002</nDup><dVenc>2026-11-13</dVenc><vDup>1101.05</vDup></dup></cobr>"""
 
@@ -315,10 +324,11 @@ def cte_subcontratacao(nome: str) -> None:
 
 def cte_complemento(nome: str) -> None:
     """tpCTe 1: nao ha infCTeNorm - so a lista dos CT-e complementados."""
+    # Comp/xNome vai ate 15 caracteres - este usa todos.
     cte_montar(
         nome, numero=91801, tpcte="1",
         vprest="""<vPrest><vTPrest>180.00</vTPrest><vRec>180.00</vRec>
-<Comp><xNome>DIFERENCA DE FRETE</xNome><vComp>180.00</vComp></Comp></vPrest>""",
+<Comp><xNome>DIFERENCA FRETE</xNome><vComp>180.00</vComp></Comp></vPrest>""",
         imp="""<ICMS00><CST>00</CST><vBC>180.00</vBC><pICMS>12.00</pICMS><vICMS>21.60</vICMS></ICMS00>""",
         vtottrib="34.20",
         corpo=f"""<infCteComp><chCTe>{ct(91723)}</chCTe></infCteComp>

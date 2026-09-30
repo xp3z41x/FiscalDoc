@@ -6,19 +6,19 @@
 <mod>57</mod><serie>1</serie><nCT>91723</nCT>
 <dhEmi>2026-09-14T09:18:37-03:00</dhEmi><tpImp>2</tpImp><tpEmis>5</tpEmis>
 <cDV>2</cDV><tpAmb>1</tpAmb><tpCTe>0</tpCTe><procEmi>0</procEmi>
-<verProc>4.0.7</verProc><dhCont>2026-09-14T07:22:00-03:00</dhCont><xJust>TEXTO DE AMOSTRA</xJust>
+<verProc>4.0.7</verProc>
 <cMunEnv>4106902</cMunEnv><xMunEnv>CURITIBA</xMunEnv><UFEnv>PR</UFEnv>
 <modal>01</modal><tpServ>0</tpServ>
 <cMunIni>4106902</cMunIni><xMunIni>CURITIBA</xMunIni><UFIni>PR</UFIni>
 <cMunFim>3550308</cMunFim><xMunFim>SAO PAULO</xMunFim><UFFim>SP</UFFim>
 <retira>1</retira><indIEToma>1</indIEToma>
-<toma3><toma>3</toma></toma3></ide>
+<toma3><toma>3</toma></toma3><dhCont>2026-09-14T07:22:00-03:00</dhCont><xJust>TEXTO DE AMOSTRA</xJust></ide>
 <compl><xObs>TEXTO DE AMOSTRA</xObs></compl>
 <emit><CNPJ>11222333000181</CNPJ><IE>9999999990</IE>
 <xNome>INDUSTRIA E COMERCIO ZENITE SA</xNome><xFant>ANA PAULA MARTINS</xFant>
 <enderEmit><xLgr>TRAVESSA DO MIRANTE</xLgr><nro>2986</nro><xBairro>CENTRO</xBairro>
 <cMun>4106902</cMun><xMun>CURITIBA</xMun><CEP>99999990</CEP><UF>PR</UF>
-<fone>9999999990</fone></enderEmit></emit>
+<fone>9999999990</fone></enderEmit><CRT>3</CRT></emit>
 <rem><CNPJ>12222333000144</CNPJ><IE>9999999990</IE>
 <xNome>ATACADISTA PONTO CARDEAL LTDA ME</xNome><fone>9999999990</fone>
 <enderReme><xLgr>ALAMEDA DAS PALMEIRAS</xLgr><nro>193</nro><xBairro>CENTRO</xBairro>

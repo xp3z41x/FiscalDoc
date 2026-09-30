@@ -344,6 +344,11 @@ Consequences baked into the code:
   name pool and they need updating.
 - CT-e / MDF-e / event samples are **synthetic**, built from the official schema
   structure. Structurally faithful, but not a substitute for real documents.
+  The CT-e ones are validated, not assumed: `cte-400-*` pass the national XSD
+  package (PL_CTe_400, NT 2026.001 — `infModal` content too, which the main
+  schema skips and only the `cteModal*` XSDs check) and `cte-300-*` passes
+  PL_CTe_300a, except for what no unsigned sample can: `ds:Signature` and a
+  Base64 `digVal`. Revalidate after changing `cte()` or `cte_montar()`.
   The CT-e set covers all six modals, complemento, substituto and a portrait
   subcontratação that carries nearly every optional group; `infCTeSupl` is a
   sibling of `infCte` there, as the schema has it (the first generator put it

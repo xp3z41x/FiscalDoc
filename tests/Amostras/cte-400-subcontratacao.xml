@@ -17,7 +17,7 @@
 <enderToma><xLgr>AVENIDA DOS IPES</xLgr><nro>100</nro><xBairro>VILA UNIAO</xBairro>
 <cMun>4106902</cMun><xMun>CURITIBA</xMun><CEP>99999990</CEP><UF>PR</UF>
 <cPais>1058</cPais><xPais>BRASIL</xPais></enderToma></toma4></ide>
-<compl><xCaracAd>CARGA PALETIZADA</xCaracAd><xCaracSer>ENTREGA AGENDADA</xCaracSer>
+<compl><xCaracAd>PALETIZADA</xCaracAd><xCaracSer>ENTREGA AGENDADA</xCaracSer>
 <fluxo><xOrig>CWB</xOrig><pass><xPass>JVE</xPass></pass><pass><xPass>REG</xPass></pass><xDest>CPQ</xDest><xRota>R12</xRota></fluxo>
 <Entrega><comData><tpPer>2</tpPer><dProg>2026-09-19</dProg></comData><noInter><tpHor>4</tpHor><hIni>08:00:00</hIni><hFim>12:00:00</hFim></noInter></Entrega>
 <xObs>TEXTO DE AMOSTRA</xObs>
@@ -66,7 +66,7 @@
 <idDocAnt><idDocAntPap><tpDoc>11</tpDoc><serie>1</serie><nDoc>15520</nDoc><dEmi>2026-09-12</dEmi></idDocAntPap></idDocAnt>
 <idDocAnt><idDocAntEle><chCTe>41260917222333000168570010000402211741141411</chCTe></idDocAntEle></idDocAnt>
 </emiDocAnt></docAnt><infModal versaoModal="4.00"><rodo><RNTRC>12345678</RNTRC><occ><serie>1</serie><nOcc>55821</nOcc><dEmi>2026-09-12</dEmi><emiOcc><CNPJ>13222333000107</CNPJ>
-<cInt>COL-7</cInt><IE>9999999990</IE><UF>RS</UF><fone>9999999990</fone></emiOcc></occ></rodo></infModal><cobr><fat><nFat>91724</nFat><vOrig>2202.10</vOrig><vDesc>0.00</vDesc><vLiq>2202.10</vLiq></fat>
+<cInt>COL-7</cInt><IE>9999999990</IE><UF>RS</UF><fone>9999999990</fone></emiOcc></occ></rodo></infModal><cobr><fat><nFat>91724</nFat><vOrig>2202.10</vOrig><vLiq>2202.10</vLiq></fat>
 <dup><nDup>001</nDup><dVenc>2026-10-14</dVenc><vDup>1101.05</vDup></dup>
 <dup><nDup>002</nDup><dVenc>2026-11-13</dVenc><vDup>1101.05</vDup></dup></cobr></infCTeNorm>
 </infCte>

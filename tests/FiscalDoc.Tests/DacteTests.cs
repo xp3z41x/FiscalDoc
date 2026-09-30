@@ -289,7 +289,7 @@ public sealed class DacteTests
     {
         ComplementoCte c = Ler("cte-400-subcontratacao.xml").Complemento;
 
-        Assert.Equal("CARGA PALETIZADA", c.CaracteristicaTransporte);
+        Assert.Equal("PALETIZADA", c.CaracteristicaTransporte);
         Assert.Equal("ENTREGA AGENDADA", c.CaracteristicaServico);
 
         Assert.Equal(new[] { "JVE", "REG" }, c.Fluxo!.Passagens);
