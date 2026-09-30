@@ -266,7 +266,7 @@ public sealed class DanfeNfceTests
 
         // Onze blocos de quatro digitos, com um espaco entre cada bloco.
         Assert.Contains(nfce.Chave!.Formatada, textos);
-        Assert.DoesNotContain(nfce.Chave.Digitos, textos);
+        Assert.DoesNotContain(nfce.Chave.Caracteres, textos);
     }
 
     [FatoComCorpusReal]

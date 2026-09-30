@@ -75,7 +75,7 @@ public sealed class LeituraNfceTests
         Assert.Equal("65", nfce.Chave!.Modelo);
         Assert.True(
             nfce.Chave.DigitoVerificadorConfere,
-            $"DV nao confere para a chave {nfce.Chave.Digitos}");
+            $"DV nao confere para a chave {nfce.Chave.Caracteres}");
     }
 
     [TeoriaComCorpusReal]
@@ -91,7 +91,7 @@ public sealed class LeituraNfceTests
         Assert.False(string.IsNullOrWhiteSpace(nfce.Suplementares.UrlConsultaChave));
 
         // A URL do QR Code carrega a propria chave do documento.
-        Assert.Contains(nfce.Chave!.Digitos, nfce.Suplementares.QrCode!, StringComparison.Ordinal);
+        Assert.Contains(nfce.Chave!.Caracteres, nfce.Suplementares.QrCode!, StringComparison.Ordinal);
     }
 
     [TeoriaComCorpusReal]

@@ -461,7 +461,7 @@ public sealed class RenderizadorWpf
     /// multiplos inteiros dela. Barra de largura irregular e o que faz leitor
     /// recusar.
     ///
-    /// <para>A lista do Code128C comeca pela margem clara, que e espaco - nao
+    /// <para>A lista do Code128 comeca pela margem clara, que e espaco - nao
     /// por barra.</para>
     /// </summary>
     private void DesenharCodigoBarras(DrawingContext dc, Primitiva.CodigoBarras b, Modo m)

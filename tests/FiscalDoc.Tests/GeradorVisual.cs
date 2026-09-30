@@ -67,6 +67,7 @@ public sealed class GeradorVisual
             ("07-sem-protocolo", Amostras.Sintetica("sem-protocolo.xml")),
             ("08-com-issqn", Amostras.Sintetica("com-issqn.xml")),
             ("11-reforma-is-e-total", Amostras.Sintetica("reforma-com-is-e-total.xml")),
+            ("12-cnpj-alfanumerico", Amostras.Sintetica("cnpj-alfanumerico.xml")),
         };
 
         if (Amostras.TemCorpusReal)
@@ -114,6 +115,7 @@ public sealed class GeradorVisual
             ("58-nfce-estrangeiro", Amostras.Sintetica("nfce-consumidor-estrangeiro.xml")),
             ("59-nfce-120itens", Amostras.Sintetica("nfce-muitos-itens.xml")),
             ("5A-nfce-sem-qrcode", Amostras.Sintetica("nfce-sem-suplementares.xml")),
+            ("5B-nfce-cnpj-alfanumerico", Amostras.Sintetica("nfce-cnpj-alfanumerico.xml")),
         };
 
         if (Amostras.TemCorpusReal)
@@ -157,12 +159,15 @@ public sealed class GeradorVisual
             ("2A-dacte-ferroviario", "cte-400-ferroviario.xml"),
             ("2B-dacte-dutoviario", "cte-400-dutoviario.xml"),
             ("2C-dacte-multimodal", "cte-400-multimodal.xml"),
+            ("2D-dacte-cnpj-alfanumerico", "cte-400-cnpj-alfanumerico.xml"),
             ("30-damdfe", "mdfe-300-rodoviario.xml"),
             ("31-damdfe-90-documentos", "mdfe-300-muitos-documentos.xml"),
             ("32-damdfe-contingencia", "mdfe-300-contingencia.xml"),
+            ("33-damdfe-cnpj-alfanumerico", "mdfe-300-cnpj-alfanumerico.xml"),
             ("40-evento-cce", "evento-nfe-cce.xml"),
             ("41-evento-cancelamento", "evento-nfe-cancelamento.xml"),
             ("42-evento-cte-entrega", "evento-cte-entrega.xml"),
+            ("43-evento-cnpj-alfanumerico", "evento-nfe-cnpj-alfanumerico.xml"),
         ];
 
         foreach ((string rotulo, string arquivo) in transporte)

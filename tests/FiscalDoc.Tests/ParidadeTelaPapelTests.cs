@@ -204,7 +204,7 @@ public sealed class ParidadeTelaPapelTests
                 "TEXTO", new RetanguloMm(4, 24, 30, 5),
                 new EstiloTexto(EstiloTexto.FamiliaPadrao, 10f)),
             new Primitiva.CodigoBarras(
-                new RetanguloMm(4, 32, 60, 8), Code128C.Codificar("3526094231641600"), 0.2f),
+                new RetanguloMm(4, 32, 60, 8), Code128.Codificar("3526094231641600"), 0.2f),
             new Primitiva.CodigoQr(
                 new RetanguloMm(4, 42, 16, 16), QrCode.Codificar("https://www.fazenda.gov.br"), 4),
             new Primitiva.Rotacionado(

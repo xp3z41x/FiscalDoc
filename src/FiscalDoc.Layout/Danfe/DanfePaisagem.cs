@@ -401,7 +401,7 @@ public static class DanfePaisagem
 
         if (nfe.Chave is not null)
         {
-            IReadOnlyList<int> modulos = Code128C.Codificar(nfe.Chave.Digitos);
+            IReadOnlyList<int> modulos = Code128.Codificar(nfe.Chave.Caracteres);
             c.Barras(
                 caixaBarras.Encolhido(1.5f, 1.2f, 1.5f, 1.2f),
                 modulos,

@@ -18,14 +18,14 @@ proper accents (`INSCRIÇÃO`, not `INSCRICAO`); they are a fiscal document.
 
 ```bash
 dotnet build -c Release                       # 0 warnings required (TreatWarningsAsErrors)
-dotnet test tests/FiscalDoc.Tests -c Release  # 397 tests
+dotnet test tests/FiscalDoc.Tests -c Release  # 444 tests (252 + 62 skipped without the real corpus)
 ```
 
 Single test class / single test:
 
 ```bash
-dotnet test tests/FiscalDoc.Tests -c Release --filter "FullyQualifiedName~Code128CTests"
-dotnet test tests/FiscalDoc.Tests -c Release --filter "FullyQualifiedName=FiscalDoc.Tests.Code128CTests.Checksum_usa_modulo_103_com_peso_pela_posicao"
+dotnet test tests/FiscalDoc.Tests -c Release --filter "FullyQualifiedName~Code128Tests"
+dotnet test tests/FiscalDoc.Tests -c Release --filter "FullyQualifiedName=FiscalDoc.Tests.Code128Tests.Checksum_usa_modulo_103_com_peso_pela_posicao"
 ```
 
 Run the app (a path argument opens that document directly):
@@ -146,7 +146,7 @@ These were each learned from a real bug. Changing them silently breaks output.
   `Display` would round every glyph advance to a whole pixel — measured, 3,5 %
   wider on the median and 11 % at worst — and pagination would start depending
   on where the document is being shown.
-- **Barcodes carry widths in *modules*, not millimetres** (`Code128C` →
+- **Barcodes carry widths in *modules*, not millimetres** (`Code128` →
   `Primitiva.CodigoBarras`). The renderer quantises the module to a whole number
   of device dots, rounding **down** so it never overflows its box. The encoded
   list starts with the **quiet zone (a space)**, not a bar.
@@ -248,6 +248,38 @@ These were each learned from a real bug. Changing them silently breaks output.
   The 14-digit issuer field holds a CPF zero-padded when the issuer is a
   person; check digits decide, and a tie (Banco do Brasil's
   00.000.000/0001-91 is one) goes to CNPJ.
+- **An access key is 44 *characters*, not 44 digits.** Since July 2026 (IN RFB
+  2.229/2024) a CNPJ may carry uppercase letters in its first twelve
+  positions, and so does the key, inside the emitter's CNPJ:
+  `[0-9]{6}[A-Z0-9]{12}[0-9]{26}` (NT Conjunta 2025.001 §5, repeated by the
+  schema NTs of NF-e 2026.004, CT-e 2025.001 §17 and MDF-e 2025.001 §4).
+  `ChaveAcesso.DeAtributoId` used to keep only digits: the letters vanished,
+  the key was refused, and the document printed with no key and no barcode —
+  and had it passed, `Code128C` would have thrown on the first letter. Now the
+  prefix is whatever letters come before the first digit, a letter is a key
+  character only in those twelve positions and only uppercase, and every DV —
+  key and CNPJ — weighs each character as ASCII − 48 (`A` = 17 … `Z` = 42),
+  which leaves every numeric DV unchanged. `Formatos` tells CNPJ from CPF by
+  **shape**, never by counting digits: a CNPJ with three letters has eleven
+  digits, and `12ABC345000188` used to print as the CPF `123.450.001-88`.
+- **The key barcode is Code 128 C switching to A for letters** (`Code128`, the
+  "modelo híbrido" of NT Conjunta 2025.001 §6, whose minimisation rules are
+  ISO/IEC 15417 Annex E restricted to A and C). A numeric key encodes exactly
+  as the old 128C — 297 modules; every synthetic and real PNG came out
+  byte-identical. With letters it reaches **385** modules (`Code128Tests`
+  enumerates all 4096 letter/digit patterns). The retrato DANFE's MOC box has
+  77.3 mm and 385 × 0.2 mm is 77.0, so the DANFE does not move;
+  `CabecalhoFiscal` sizes the DACTE/DAMDFE key column from the **encoded**
+  module count, and it only grows when the code asks. Three things in the NT
+  are wrong and deliberately not followed: its prose says the switch uses
+  code 100 (in set C that is CODE B — its own worked example uses 101 and 99,
+  as the spec does); its width table sums every symbol but Stop to 10
+  modules (it points to the Code 128 spec for the real set); and it raises the MOC's
+  6 cm minimum width for non-impact printers to 11.5 cm, from a 539-module
+  worst case its own rules never produce and that cannot fit the 8.03 cm the
+  MOC reserves in the retrato DANFE. What is enforced is the 0.02 cm minimum
+  module, which the NT keeps. The 11.5 cm is an open decision for the user,
+  not an oversight — see *CNPJ alfanumérico* in `README.md`.
 
 ## The normative asymmetry — essential domain context
 
@@ -327,7 +359,8 @@ Consequences baked into the code:
   corpus lacks (contingência, homologação, no protocol, ISSQN, CPF, Latin-1,
   CT-e, MDF-e, events, Imposto Seletivo; for the NFC-e: offline contingency,
   homologação, discount and surcharge, several payment methods with troco,
-  foreign consumer, a 120-item roll, and a file with no `infNFeSupl`).
+  foreign consumer, a 120-item roll, and a file with no `infNFeSupl`; and one
+  `*-cnpj-alfanumerico.xml` per family — NF-e, NFC-e, CT-e, MDF-e, event).
   **Both scripts write into this one folder — never `rmtree` it from either.**
   The NF-e/NFC-e samples are *derived from the real corpus by transformation*,
   not built from nothing — which is why every write goes through
@@ -339,6 +372,12 @@ Consequences baked into the code:
   `str.replace` chained whenever a fictitious value equalled another number's
   original, which corrupted the events' keys (cUF+AAMM overwritten by a CNPJ)
   and merged a toma4 tomador's CNPJ into the emitente's.
+  Alphanumeric CNPJs and keys are recognised (`anonimizar.CNPJ`, `.CHAVE`)
+  and swapped **kind for kind**: numeric to `cnpj_ficticio`, alphanumeric to
+  `cnpj_alfanumerico_ficticio` (the first one is the RFB's own example,
+  12.ABC.345/01DE-35). Matching only digits would let a real document's
+  alphanumeric CNPJ and key through to the public repository — and swapping
+  to a numeric one would erase the dimension the sample exists to test.
   Output is deterministic: generating twice yields identical bytes. Three
   tests pin values it produces (`TransporteTests`, `VariacoesTests`); change a
   name pool and they need updating.

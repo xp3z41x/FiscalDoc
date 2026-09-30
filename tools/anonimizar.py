@@ -24,27 +24,68 @@ Duas propriedades importam mais do que a aparencia do resultado:
 2. **Os digitos verificadores sao recalculados** - de CNPJ, de CPF e da chave
    de acesso. Trocar o CNPJ sem refazer o DV da chave produziria um arquivo
    que os proprios testes recusam, com razao.
+
+3. **CNPJ alfanumerico continua alfanumerico.** Desde julho de 2026 a Receita
+   emite CNPJ com letras (IN RFB 2.229/2024), e a chave de acesso carrega essas
+   letras nas posicoes do CNPJ. Um documento assim que chegue ao corpus real
+   tem de sair daqui anonimizado - reconhecer so digitos deixava o CNPJ e a
+   chave verdadeiros passarem intactos para o repositorio publico - e tem de
+   sair ainda com letras, que e a dimensao que a amostra existe para exercitar.
 """
 
 import re
 
+# CNPJ: letras maiusculas nas doze primeiras posicoes, digitos nas duas do DV
+# (NT Conjunta 2025.001, item 4). Chave de acesso: as mesmas letras dentro do
+# CNPJ embutido, e so ali (item 5).
+CNPJ = r"[0-9A-Z]{12}[0-9]{2}"
+CHAVE = r"[0-9]{6}[0-9A-Z]{12}[0-9]{26}"
+
 # ---------------------------------------------------------------------
 #  Digitos verificadores
 # ---------------------------------------------------------------------
+#
+# Todo caractere entra no modulo 11 pelo codigo ASCII menos 48 (NT Conjunta
+# 2025.001, itens 2 e 5; RFB, Perguntas e Respostas do CNPJ alfanumerico,
+# pergunta 14). Digito vale ele mesmo, e letra vale de 17 ("A") a 42 ("Z") -
+# por isso int() nao serve mais.
+
+
+def _valor(c: str) -> int:
+    return ord(c) - 48
 
 
 def _dv_modulo11(digitos: str, pesos: list[int]) -> str:
-    soma = sum(int(d) * p for d, p in zip(digitos, pesos))
+    soma = sum(_valor(d) * p for d, p in zip(digitos, pesos))
     resto = soma % 11
     return "0" if resto < 2 else str(11 - resto)
 
 
-def cnpj_ficticio(indice: int) -> str:
-    """CNPJ ficticio com DV valido. Raiz 11222333, 12222333, ..."""
-    base = f"{11 + indice:02d}" + "222333" + "0001"
+def _cnpj_com_dv(base: str) -> str:
     d1 = _dv_modulo11(base, [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2])
     d2 = _dv_modulo11(base + d1, [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2])
     return base + d1 + d2
+
+
+def cnpj_ficticio(indice: int) -> str:
+    """CNPJ ficticio com DV valido. Raiz 11222333, 12222333, ..."""
+    return _cnpj_com_dv(f"{11 + indice:02d}" + "222333" + "0001")
+
+
+def cnpj_alfanumerico_ficticio(indice: int) -> str:
+    """
+    CNPJ alfanumerico ficticio com DV valido. O primeiro e o exemplo da propria
+    Receita, 12.ABC.345/01DE-35 - letra na raiz e na ordem -, e os seguintes
+    trocam so os dois primeiros caracteres.
+    """
+    return _cnpj_com_dv(f"{12 + indice:02d}" + "ABC345" + "01DE")
+
+
+def _ficticio_como(original: str, indice: int) -> str:
+    """Numerico vira numerico e alfanumerico vira alfanumerico."""
+    if original.isdigit():
+        return cnpj_ficticio(indice)
+    return cnpj_alfanumerico_ficticio(indice)
 
 
 def cpf_ficticio(indice: int) -> str:
@@ -60,9 +101,12 @@ def cpf_ficticio(indice: int) -> str:
 
 
 def dv_chave(chave43: str) -> str:
-    """Modulo 11 com pesos 2..9 ciclicos a partir da direita (MOC Anexo III)."""
+    """
+    Modulo 11 com pesos 2..9 ciclicos a partir da direita (MOC Anexo III),
+    sobre o valor ASCII - 48 de cada caractere (NT Conjunta 2025.001, item 5).
+    """
     pesos = [2, 3, 4, 5, 6, 7, 8, 9]
-    soma = sum(int(c) * pesos[i % 8] for i, c in enumerate(reversed(chave43)))
+    soma = sum(_valor(c) * pesos[i % 8] for i, c in enumerate(reversed(chave43)))
     resto = soma % 11
     return "0" if resto in (0, 1) else str(11 - resto)
 
@@ -178,17 +222,17 @@ def anonimizar(xml: str) -> str:
     # que o <CNPJDest> de um evento sobreviveu a primeira versao disto.
     mapa_cnpj: dict[str, str] = {}
     for antigo in dict.fromkeys(
-        m.group(2) for m in re.finditer(r"<(\w*CNPJ\w*)>(\d{14})</\1>", xml)
+        m.group(2) for m in re.finditer(rf"<(\w*CNPJ\w*)>({CNPJ})</\1>", xml)
     ):
-        mapa_cnpj[antigo] = cnpj_ficticio(len(mapa_cnpj))
+        mapa_cnpj[antigo] = _ficticio_como(antigo, len(mapa_cnpj))
 
     # Um CNPJ pode aparecer SO dentro de uma chave de acesso e em nenhuma tag
     # <CNPJ> - e o caso do MDF-e, que referencia as NF-e de outros emitentes
     # por <chNFe> e mais nada. Sem colher daqui, esses ficavam intactos.
-    for chave in dict.fromkeys(re.findall(r"\d{44}", xml)):
+    for chave in dict.fromkeys(re.findall(CHAVE, xml)):
         embutido = chave[6:20]
         if embutido not in mapa_cnpj:
-            mapa_cnpj[embutido] = cnpj_ficticio(len(mapa_cnpj))
+            mapa_cnpj[embutido] = _ficticio_como(embutido, len(mapa_cnpj))
 
     mapa_cpf: dict[str, str] = {}
     for antigo in dict.fromkeys(
@@ -203,7 +247,7 @@ def anonimizar(xml: str) -> str:
         corpo = chave[:6] + mapa_cnpj.get(cnpj, cnpj) + chave[20:43]
         return corpo + dv_chave(corpo)
 
-    mapa_chave = {c: nova_chave(c) for c in dict.fromkeys(re.findall(r"\d{44}", xml))}
+    mapa_chave = {c: nova_chave(c) for c in dict.fromkeys(re.findall(CHAVE, xml))}
 
     # Uma passada so, e nao um replace por mapa. Em cadeia, o valor novo de um
     # numero podia ser o valor ANTIGO de outro, e o replace seguinte o trocava

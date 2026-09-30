@@ -213,6 +213,39 @@ Quando a SEFAZ publicar o layout oficial, o ajuste é trocar rótulos e reordena
 campos em `DanfeRetrato.DesenharIbsCbs` — não há geometria inventada espalhada
 pelo código.
 
+### CNPJ alfanumérico
+
+Desde julho de 2026 a Receita Federal emite CNPJ com letras (IN RFB nº
+2.229/2024): as doze primeiras posições — raiz e ordem — admitem letra
+maiúscula, e as duas do dígito verificador continuam numéricas. A máscara é a
+de sempre: `12.ABC.345/01DE-35`.
+
+A letra entra também na chave de acesso, nas posições do CNPJ do emitente
+(`[0-9]{6}[A-Z0-9]{12}[0-9]{26}`). O tratamento segue a **NT Conjunta
+2025.001** (ENCAT/RFB), que vale para NF-e, NFC-e, CT-e e MDF-e, e as NTs de
+schema de cada projeto (NF-e 2026.004, CT-e 2025.001, MDF-e 2025.001):
+
+- **Dígito verificador.** O da chave e o do CNPJ continuam sendo módulo 11,
+  mas cada caractere vale o seu código ASCII menos 48: o dígito vale ele
+  mesmo, e `A` vale 17, `B` 18… `Z` 42.
+- **Código de barras.** O CODE-128C só codifica dígitos. Com letra na chave, o
+  código passa ao modelo híbrido da NT: começa no subconjunto C e troca para o
+  A diante das letras. A chave só de dígitos sai exatamente como antes.
+- **CNPJ e CPF se distinguem pela forma, e não pela contagem de dígitos.** Um
+  CNPJ com três letras tem onze dígitos; contá-los imprimia no campo
+  "CNPJ / CPF" um CPF que não está no arquivo.
+
+**A largura mínima de 11,5 cm da NT não é aplicada.** A NT reproduz o texto do
+MOC 7.00 Anexo II §2 trocando a largura mínima do código, em impressora não
+matricial, de 6 cm para 11,5 cm — tirada de um pior caso de 539 módulos, um
+caractere por símbolo. O quadro que o MOC reserva ao código no DANFE retrato
+tem 8,03 cm, e a NT não o altera. Pelas próprias regras de codificação da NT,
+uma chave de 44 posições chega a no máximo 385 módulos, que no módulo mínimo
+de 0,02 cm — mantido pela NT — ocupam 7,7 cm e cabem no quadro do MOC. O
+FiscalDoc garante esse módulo mínimo em todos os documentos auxiliares e mantém a
+geometria do MOC; no DACTE e no DAMDFE, cuja geometria é livre, a coluna da
+chave cresce o necessário.
+
 ## Impressão
 
 Agnóstica de impressora. O tamanho do papel vem da lista do próprio driver, a
@@ -252,8 +285,8 @@ A suíte tem duas origens de amostra, e só uma delas está no repositório.
 comum não tem: contingência (SVC-AN, FS-DA e offline da NFC-e), homologação,
 ausência de protocolo, ISSQN, destinatário pessoa física, arquivo em Latin-1,
 Imposto Seletivo, cupom de 120 itens, NFC-e sem `infNFeSupl`, CT-e dos seis
-modais — de complemento, substituto e de subcontratação inclusive —, MDF-e e
-eventos.
+modais — de complemento, substituto e de subcontratação inclusive —, MDF-e,
+eventos e documentos de emitente com CNPJ alfanumérico.
 
 As de CT-e, MDF-e e evento são montadas do zero a partir da estrutura dos
 schemas oficiais. As de NF-e e NFC-e **derivam de documentos reais por
@@ -263,7 +296,9 @@ sob teste muda. Por isso **toda** saída dos geradores passa por
 social, endereço, telefone, inscrição estadual, protocolo e descrição de
 produto por dado fictício, e **recalcula os dígitos verificadores** de CNPJ,
 CPF e chave de acesso — trocar o CNPJ sem refazer o DV da chave produziria
-arquivo que os próprios testes recusam.
+arquivo que os próprios testes recusam. CNPJ alfanumérico é reconhecido e
+trocado por outro alfanumérico: reconhecer só dígitos deixaria passar intactos
+o CNPJ e a chave de um documento real com letras.
 
 A chamada mora dentro do `escrever` de cada gerador, e não em cada amostra,
 justamente para que uma amostra nova não possa esquecer o passo. O resultado é
@@ -277,7 +312,7 @@ terceiros e não é nosso para publicar.
 
 Numa cópia sem essa pasta a suíte **passa**: os 62 testes que exigem documento
 real se declaram *ignorados*, com o motivo, em vez de falhar — falha quer dizer
-defeito, e não há defeito nenhum em não ter o corpus. Os outros 158 rodam
+defeito, e não há defeito nenhum em não ter o corpus. Os outros 252 rodam
 normalmente, e as PNGs de conferência visual continuam sendo geradas a partir
 das amostras sintéticas.
 

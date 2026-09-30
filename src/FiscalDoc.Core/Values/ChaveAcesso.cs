@@ -1,30 +1,45 @@
 namespace FiscalDoc.Core.Values;
 
 /// <summary>
-/// Chave de acesso de 44 digitos, comum a NF-e, CT-e e MDF-e.
+/// Chave de acesso de 44 posicoes, comum a NF-e, CT-e e MDF-e.
 ///
 /// Composicao (MOC 7.0 Visao Geral, Tabela 2-1):
 /// cUF(2) AAMM(4) CNPJ(14) mod(2) serie(3) nNF(9) tpEmis(1) cNF(8) cDV(1).
+///
+/// <para>Com o CNPJ alfanumerico (IN RFB 2.229/2024, emitido desde julho de
+/// 2026), as doze primeiras posicoes do CNPJ podem trazer letra maiuscula - e
+/// so elas: a expressao da chave passou a <c>[0-9]{6}[A-Z0-9]{12}[0-9]{26}</c>
+/// (NT Conjunta 2025.001, item 5, repetida pela NT 2026.004 da NF-e, pela NT
+/// 2025.001 do CT-e, item 17, e pela NT 2025.001 do MDF-e, item 4). Por isso a
+/// chave e texto de 44 caracteres, e nao numero de 44 digitos.</para>
 /// </summary>
 public sealed record ChaveAcesso
 {
-    private ChaveAcesso(string digitos)
+    private const int Tamanho = 44;
+
+    /// <summary>Posicao do CNPJ do emitente na chave, contada de zero.</summary>
+    private const int InicioCnpj = 6;
+
+    /// <summary>Raiz e ordem do CNPJ: as posicoes que admitem letra.</summary>
+    private const int PosicoesAlfanumericas = 12;
+
+    private ChaveAcesso(string caracteres)
     {
-        Digitos = digitos;
+        Caracteres = caracteres;
     }
 
-    /// <summary>Os 44 digitos, sem prefixo e sem separador.</summary>
-    public string Digitos { get; }
+    /// <summary>Os 44 caracteres, sem prefixo e sem separador.</summary>
+    public string Caracteres { get; }
 
-    public string CodigoUf => Digitos[..2];
-    public string AnoMes => Digitos.Substring(2, 4);
-    public string CnpjEmitente => Digitos.Substring(6, 14);
-    public string Modelo => Digitos.Substring(20, 2);
-    public string Serie => Digitos.Substring(22, 3);
-    public string Numero => Digitos.Substring(25, 9);
-    public string TipoEmissao => Digitos.Substring(34, 1);
-    public string CodigoNumerico => Digitos.Substring(35, 8);
-    public string DigitoVerificador => Digitos.Substring(43, 1);
+    public string CodigoUf => Caracteres[..2];
+    public string AnoMes => Caracteres.Substring(2, 4);
+    public string CnpjEmitente => Caracteres.Substring(InicioCnpj, 14);
+    public string Modelo => Caracteres.Substring(20, 2);
+    public string Serie => Caracteres.Substring(22, 3);
+    public string Numero => Caracteres.Substring(25, 9);
+    public string TipoEmissao => Caracteres.Substring(34, 1);
+    public string CodigoNumerico => Caracteres.Substring(35, 8);
+    public string DigitoVerificador => Caracteres.Substring(43, 1);
 
     /// <summary>
     /// CNPJ ou CPF do emitente, com o tamanho certo para ser formatado.
@@ -37,6 +52,9 @@ public sealed record ChaveAcesso
     /// das chaves que comecam por 000, fica o CNPJ - pessoa juridica e de
     /// longe o emitente mais comum, e o Banco do Brasil, 00.000.000/0001-91,
     /// e um exemplo real do empate.</para>
+    ///
+    /// <para>Campo com letra e CNPJ alfanumerico sem discussao: CPF so tem
+    /// digitos.</para>
     /// </summary>
     public string DocumentoEmitente
     {
@@ -59,16 +77,16 @@ public sealed record ChaveAcesso
     /// O app nao recusa chave com DV errado - so imprime o que esta no arquivo,
     /// conforme o MOC. Mas calcular e barato e a informacao fica disponivel.
     /// </summary>
-    public bool DigitoVerificadorConfere => CalcularDv(Digitos[..43]) == Digitos[43] - '0';
+    public bool DigitoVerificadorConfere => CalcularDv(Caracteres[..43]) == Caracteres[43] - '0';
 
     /// <summary>
-    /// Formatacao de impressao: onze grupos de quatro digitos
+    /// Formatacao de impressao: onze grupos de quatro caracteres
     /// (MOC 7.0 Anexo II, 3.1.1).
     /// </summary>
-    public string Formatada => string.Create(44 + 10, Digitos, static (destino, origem) =>
+    public string Formatada => string.Create(Tamanho + 10, Caracteres, static (destino, origem) =>
     {
         int j = 0;
-        for (int i = 0; i < 44; i++)
+        for (int i = 0; i < Tamanho; i++)
         {
             if (i > 0 && i % 4 == 0)
             {
@@ -79,12 +97,21 @@ public sealed record ChaveAcesso
         }
     });
 
-    public override string ToString() => Digitos;
+    public override string ToString() => Caracteres;
 
     /// <summary>
     /// Extrai a chave do atributo Id de infNFe/infCte/infMDFe, que vem como
-    /// "NFe" + 44 digitos (ou "CTe"/"MDFe"). Tolera o Id sem prefixo e
-    /// separadores acidentais.
+    /// "NFe" + 44 caracteres (ou "CTe"/"MDFe"), ou de uma tag de chave, que vem
+    /// sem prefixo. Tolera separadores acidentais.
+    ///
+    /// <para>O prefixo se reconhece por ser feito so de letras: a chave comeca
+    /// por cUF e AAMM, seis digitos, e nenhuma letra antes deles pode ser dela.
+    /// Guardar so os digitos - como isto fazia ate o CNPJ alfanumerico - jogava
+    /// fora as letras do CNPJ e recusava a chave inteira: o documento saia sem
+    /// chave e sem codigo de barras.</para>
+    ///
+    /// <para>Letra so vale nas posicoes do CNPJ, e so maiuscula, que e o que o
+    /// schema admite. Em qualquer outro lugar, nao e chave.</para>
     /// </summary>
     public static ChaveAcesso? DeAtributoId(string? id)
     {
@@ -93,29 +120,70 @@ public sealed record ChaveAcesso
             return null;
         }
 
-        Span<char> so = stackalloc char[44];
+        Span<char> so = stackalloc char[Tamanho];
         int n = 0;
+        bool noPrefixo = true;
+
         foreach (char c in id)
         {
-            if (c is >= '0' and <= '9')
+            if (!char.IsAsciiLetterOrDigit(c))
             {
-                if (n == 44)
-                {
-                    return null; // mais de 44 digitos: nao e chave
-                }
+                continue; // separador
+            }
 
-                so[n++] = c;
+            if (noPrefixo && char.IsAsciiLetter(c))
+            {
+                continue; // "NFe", "CTe", "MDFe"
+            }
+
+            noPrefixo = false;
+
+            if (n == Tamanho)
+            {
+                return null; // mais de 44 caracteres: nao e chave
+            }
+
+            so[n++] = c;
+        }
+
+        return n == Tamanho && TemFormaDeChave(so) ? new ChaveAcesso(new string(so)) : null;
+    }
+
+    /// <summary><c>[0-9]{6}[A-Z0-9]{12}[0-9]{26}</c>.</summary>
+    private static bool TemFormaDeChave(ReadOnlySpan<char> c)
+    {
+        for (int i = 0; i < c.Length; i++)
+        {
+            bool noCnpj = i is >= InicioCnpj and < InicioCnpj + PosicoesAlfanumericas;
+
+            if (!char.IsAsciiDigit(c[i]) && !(noCnpj && char.IsAsciiLetterUpper(c[i])))
+            {
+                return false;
             }
         }
 
-        return n == 44 ? new ChaveAcesso(new string(so)) : null;
+        return true;
     }
 
+    /// <summary>
+    /// CNPJ de 14 posicoes, <c>[A-Z0-9]{12}[0-9]{2}</c>, com os dois DV
+    /// conferindo. Serve igual ao numerico e ao alfanumerico: a regra nova do
+    /// DV foi escolhida para dar o mesmo resultado nos CNPJ que ja existem
+    /// (NT Conjunta 2025.001, item 2).
+    /// </summary>
     private static bool CnpjConfere(string d)
     {
-        if (d.Length != 14)
+        if (d.Length != 14 || !char.IsAsciiDigit(d[12]) || !char.IsAsciiDigit(d[13]))
         {
             return false;
+        }
+
+        for (int i = 0; i < PosicoesAlfanumericas; i++)
+        {
+            if (!char.IsAsciiDigit(d[i]) && !char.IsAsciiLetterUpper(d[i]))
+            {
+                return false;
+            }
         }
 
         int[] pesos1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
@@ -125,9 +193,10 @@ public sealed record ChaveAcesso
             && DvCadastro(d, pesos2) == d[13] - '0';
     }
 
+    /// <summary>CPF de 11 digitos - nunca tem letra - com os dois DV conferindo.</summary>
     private static bool CpfConfere(string d)
     {
-        if (d.Length != 11)
+        if (d.Length != 11 || !d.All(char.IsAsciiDigit))
         {
             return false;
         }
@@ -141,21 +210,24 @@ public sealed record ChaveAcesso
 
     /// <summary>
     /// Modulo 11 do CNPJ e do CPF sobre os primeiros <c>pesos.Length</c>
-    /// digitos: resto menor que 2 vira zero.
+    /// caracteres: resto menor que 2 vira zero.
     /// </summary>
     private static int DvCadastro(string d, int[] pesos)
     {
         int soma = 0;
         for (int i = 0; i < pesos.Length; i++)
         {
-            soma += (d[i] - '0') * pesos[i];
+            soma += Valor(d[i]) * pesos[i];
         }
 
         int resto = soma % 11;
         return resto < 2 ? 0 : 11 - resto;
     }
 
-    /// <summary>Modulo 11 do MOC: pesos 2..9 ciclicos, da direita para a esquerda.</summary>
+    /// <summary>
+    /// Modulo 11 do MOC: pesos 2..9 ciclicos, da direita para a esquerda, sobre
+    /// o <see cref="Valor"/> de cada caractere (NT Conjunta 2025.001, item 5).
+    /// </summary>
     public static int CalcularDv(string primeiros43)
     {
         int soma = 0;
@@ -163,11 +235,20 @@ public sealed record ChaveAcesso
 
         for (int i = primeiros43.Length - 1; i >= 0; i--)
         {
-            soma += (primeiros43[i] - '0') * peso;
+            soma += Valor(primeiros43[i]) * peso;
             peso = peso == 9 ? 2 : peso + 1;
         }
 
         int resto = soma % 11;
         return resto is 0 or 1 ? 0 : 11 - resto;
     }
+
+    /// <summary>
+    /// Quanto um caractere vale no modulo 11: o codigo ASCII menos 48. O
+    /// digito vale ele mesmo, e a letra vale de 17 ("A") a 42 ("Z") - regra
+    /// do CNPJ alfanumerico (NT Conjunta 2025.001, item 2; RFB, Perguntas e
+    /// Respostas do CNPJ alfanumerico, pergunta 14), que a NT estende a chave
+    /// inteira (item 5).
+    /// </summary>
+    private static int Valor(char c) => c - '0';
 }

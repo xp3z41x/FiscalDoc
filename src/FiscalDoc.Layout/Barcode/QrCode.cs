@@ -5,7 +5,7 @@ namespace FiscalDoc.Layout.Barcode;
 /// <summary>
 /// Matriz de modulos de um simbolo QR, sem margem clara.
 ///
-/// Como no <see cref="Code128C"/>, o que sai daqui e <b>modulo</b>, e nao
+/// Como no <see cref="Code128"/>, o que sai daqui e <b>modulo</b>, e nao
 /// milimetro: quem decide quantos pontos do dispositivo vale um modulo e o
 /// renderizador, que conhece o DPI real. Um QR rasterizado em bitmap e depois
 /// reescalado sai com modulos de larguras desiguais, e leitor de celular
@@ -63,7 +63,7 @@ public sealed class MatrizQr
 ///
 /// <para><b>Por que a mao, e nao por biblioteca.</b> Pelo mesmo motivo do
 /// Code 128: biblioteca devolve bitmap, e bitmap reescalado para 600 dpi sai
-/// com modulos desiguais. Ver <see cref="Code128C"/>.</para>
+/// com modulos desiguais. Ver <see cref="Code128"/>.</para>
 ///
 /// <para>As duas tabelas transcritas se autovalidam contra a formula de
 /// contagem de modulos da norma - ver <see cref="TabelasSaoConsistentes"/>.</para>
@@ -203,7 +203,7 @@ public static class QrCode
 
     /// <summary>
     /// Autoteste das tabelas transcritas, no mesmo espirito do
-    /// <see cref="Code128C.TabelaEhConsistente"/>: as duas tabelas so fazem
+    /// <see cref="Code128.TabelaEhConsistente"/>: as duas tabelas so fazem
     /// sentido se, em toda versao, os blocos couberem exatamente no total de
     /// codewords que a formula da norma preve, com pelo menos um byte de dados
     /// por bloco, com blocos curtos e longos diferindo em no maximo um byte, e

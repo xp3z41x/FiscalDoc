@@ -84,38 +84,72 @@ public static class Formatos
     public static string Percentual(decimal? v) =>
         v is null ? string.Empty : v.Value.ToString("N2", Br);
 
-    /// <summary>00.000.000/0000-00</summary>
+    /// <summary>
+    /// 00.000.000/0000-00. O CNPJ alfanumerico (IN RFB 2.229/2024) usa a mesma
+    /// mascara, com as letras onde antes so havia digito: 12.ABC.345/01DE-35
+    /// (RFB, Perguntas e Respostas do CNPJ alfanumerico, pergunta 21).
+    /// </summary>
     public static string Cnpj(string? v)
     {
-        string d = SoDigitos(v);
-        return d.Length != 14
+        string d = SoLetrasEDigitos(v);
+        return !TemFormaDeCnpj(d)
             ? v ?? string.Empty
             : $"{d[..2]}.{d.Substring(2, 3)}.{d.Substring(5, 3)}/{d.Substring(8, 4)}-{d.Substring(12, 2)}";
     }
 
-    /// <summary>000.000.000-00</summary>
+    /// <summary>000.000.000-00. CPF so tem digitos: com letra, sai como veio.</summary>
     public static string Cpf(string? v)
     {
-        string d = SoDigitos(v);
-        return d.Length != 11
+        string d = SoLetrasEDigitos(v);
+        return !TemFormaDeCpf(d)
             ? v ?? string.Empty
             : $"{d[..3]}.{d.Substring(3, 3)}.{d.Substring(6, 3)}-{d.Substring(9, 2)}";
     }
 
     /// <summary>
-    /// Escolhe entre CNPJ e CPF pelo comprimento. E o que o campo "CNPJ / CPF"
-    /// do DANFE precisa, ja que a mesma caixa recebe os dois.
+    /// Escolhe entre CNPJ e CPF pela forma. E o que o campo "CNPJ / CPF" do
+    /// DANFE precisa, ja que a mesma caixa recebe os dois.
+    ///
+    /// <para>Pela forma, e nao pelo numero de digitos: um CNPJ alfanumerico com
+    /// tres letras tem onze digitos, e contar so os digitos imprimia
+    /// 12ABC345000188 como o CPF 123.450.001-88 - que nao esta no arquivo
+    /// (MOC 3.1).</para>
     /// </summary>
     public static string CnpjOuCpf(string? v)
     {
-        string d = SoDigitos(v);
-        return d.Length switch
+        string d = SoLetrasEDigitos(v);
+
+        if (TemFormaDeCnpj(d))
         {
-            14 => Cnpj(d),
-            11 => Cpf(d),
-            _ => v ?? string.Empty,
-        };
+            return Cnpj(d);
+        }
+
+        return TemFormaDeCpf(d) ? Cpf(d) : v ?? string.Empty;
     }
+
+    /// <summary>
+    /// <c>[A-Z0-9]{12}[0-9]{2}</c>: letra maiuscula so na raiz e na ordem, e o
+    /// DV sempre numerico (NT Conjunta 2025.001, item 4).
+    /// </summary>
+    private static bool TemFormaDeCnpj(string d)
+    {
+        if (d.Length != 14)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < d.Length; i++)
+        {
+            if (!char.IsAsciiDigit(d[i]) && !(i < 12 && char.IsAsciiLetterUpper(d[i])))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool TemFormaDeCpf(string d) => d.Length == 11 && d.All(char.IsAsciiDigit);
 
     /// <summary>00000-000</summary>
     public static string Cep(string? v)
@@ -177,7 +211,16 @@ public static class Formatos
         return d.Length == 0 ? "0" : d;
     }
 
-    private static string SoDigitos(string? v)
+    private static string SoDigitos(string? v) => Filtrar(v, char.IsAsciiDigit);
+
+    /// <summary>
+    /// Tira a mascara - ponto, barra, hifen, espaco - e fica com o resto. A
+    /// letra fica: e parte do CNPJ alfanumerico, e jogada fora deixava onze
+    /// digitos que se passavam por CPF.
+    /// </summary>
+    private static string SoLetrasEDigitos(string? v) => Filtrar(v, char.IsAsciiLetterOrDigit);
+
+    private static string Filtrar(string? v, Func<char, bool> manter)
     {
         if (string.IsNullOrEmpty(v))
         {
@@ -189,7 +232,7 @@ public static class Formatos
 
         foreach (char c in v)
         {
-            if (c is >= '0' and <= '9')
+            if (manter(c))
             {
                 buffer[n++] = c;
             }

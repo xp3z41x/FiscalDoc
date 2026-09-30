@@ -3,11 +3,12 @@ Gera amostras sinteticas a partir das NF-e e NFC-e reais de "Exemplos XML".
 
 As 10 NF-e reais cobrem retrato, paisagem, paginacao, infAdProd e descricoes
 longas, mas nao cobrem: contingencia, homologacao, documento sem protocolo,
-ISSQN, destinatario pessoa fisica, encoding ISO-8859-1 nem documento sem
-envelope. As 12 NFC-e reais sao todas normais, autorizadas, em producao, com
-uma forma de pagamento so e sem desconto - faltam contingencia offline,
-homologacao, varias formas de pagamento, desconto e acrescimo, consumidor
-estrangeiro, cupom longo o bastante para paginar e arquivo sem infNFeSupl.
+ISSQN, destinatario pessoa fisica, encoding ISO-8859-1, documento sem
+envelope nem CNPJ alfanumerico. As 12 NFC-e reais sao todas normais,
+autorizadas, em producao, com uma forma de pagamento so e sem desconto -
+faltam contingencia offline, homologacao, varias formas de pagamento, desconto
+e acrescimo, consumidor estrangeiro, cupom longo o bastante para paginar,
+arquivo sem infNFeSupl e emitente de CNPJ alfanumerico.
 
 Estes casos existem no mundo real e o layout precisa deles, entao sao
 derivados aqui por transformacao das reais - assim os valores continuam
@@ -26,7 +27,7 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
-from anonimizar import anonimizar  # noqa: E402
+from anonimizar import anonimizar, cnpj_alfanumerico_ficticio  # noqa: E402
 
 RAIZ = pathlib.Path(__file__).resolve().parent.parent
 ORIGEM = RAIZ / "Exemplos XML"
@@ -123,6 +124,18 @@ def inserir_depois(xml: str, tag: str, trecho: str) -> str:
     alvo = f"</{tag}>"
     i = xml.index(alvo) + len(alvo)
     return xml[:i] + trecho + xml[i:]
+
+
+def com_cnpj_alfanumerico(xml: str, grupo: str, indice: int) -> str:
+    """
+    Troca o CNPJ numerico de <grupo> por um alfanumerico em todo o documento:
+    na tag e dentro de toda chave de acesso que o carrega. O DV dessas chaves
+    fica para a anonimizacao, que refaz o de toda chave que encontra.
+    """
+    m = re.search(rf"<{grupo}>\s*<CNPJ>(\d{{14}})</CNPJ>", xml)
+    if not m:
+        raise SystemExit(f"<{grupo}> sem CNPJ numerico")
+    return xml.replace(m.group(1), cnpj_alfanumerico_ficticio(indice))
 
 
 def escrever(nome: str, conteudo: str, encoding: str = "utf-8") -> None:
@@ -227,6 +240,11 @@ def gerar_nfce() -> None:
     sem_supl = re.sub(r"<infNFeSupl>.*?</infNFeSupl>", "", base, flags=re.DOTALL)
     escrever("nfce-sem-suplementares.xml", sem_supl)
 
+    # --- CNPJ alfanumerico ---------------------------------------------------
+    # A chave impressa na divisao IV e a do QR Code da divisao V passam a ter
+    # letras nas posicoes do CNPJ do emitente.
+    escrever("nfce-cnpj-alfanumerico.xml", com_cnpj_alfanumerico(base, "emit", 0))
+
 
 def main() -> None:
     if not ORIGEM.is_dir():
@@ -303,6 +321,15 @@ def main() -> None:
                  "<dest><CPF>12345678909</CPF>", base, count=1)
     cpf = cpf.replace("<indIEDest>1</indIEDest>", "<indIEDest>9</indIEDest>", 1)
     escrever("destinatario-cpf.xml", cpf)
+
+    # --- CNPJ alfanumerico ---------------------------------------------------
+    # Emitido desde julho de 2026 (IN RFB 2.229/2024): letras nas doze
+    # primeiras posicoes. A chave de acesso passa a ter letras nas posicoes do
+    # CNPJ do emitente, e o codigo de barras sai no modelo hibrido 128C/128A
+    # (NT Conjunta 2025.001). Emitente e destinatario com letras, porque o
+    # DANFE formata os dois.
+    alfa = com_cnpj_alfanumerico(com_cnpj_alfanumerico(base, "emit", 0), "dest", 1)
+    escrever("cnpj-alfanumerico.xml", alfa)
 
     # --- Reforma tributária completa ----------------------------------------
     # Nenhuma nota real do corpus traz Imposto Seletivo, e em todas o vNFTot

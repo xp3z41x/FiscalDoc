@@ -61,19 +61,20 @@ public sealed class LeituraNfeTests
 
     [TeoriaComCorpusReal]
     [MemberData(nameof(TodasAsReais))]
-    public void Toda_amostra_real_tem_chave_de_44_digitos_com_dv_valido(string nome)
+    public void Toda_amostra_real_tem_chave_de_44_posicoes_com_dv_valido(string nome)
     {
         NfeDocumento nfe = LerReal(nome);
 
+        // Letra so nas posicoes do CNPJ: desde julho de 2026 uma nota real
+        // pode vir de emitente com CNPJ alfanumerico (NT Conjunta 2025.001).
         Assert.NotNull(nfe.Chave);
-        Assert.Equal(44, nfe.Chave!.Digitos.Length);
-        Assert.All(nfe.Chave.Digitos, c => Assert.InRange(c, '0', '9'));
+        Assert.Matches("^[0-9]{6}[0-9A-Z]{12}[0-9]{26}$", nfe.Chave!.Caracteres);
 
         // O DV das chaves reais tem de fechar: se o modulo 11 estiver errado,
         // esta errado no nosso codigo, nao no arquivo da SEFAZ.
         Assert.True(
             nfe.Chave.DigitoVerificadorConfere,
-            $"DV nao confere para a chave {nfe.Chave.Digitos}");
+            $"DV nao confere para a chave {nfe.Chave.Caracteres}");
 
         // O modelo embutido na chave tem de bater com o campo ide/mod.
         Assert.Equal(nfe.Ide.Modelo, nfe.Chave.Modelo);

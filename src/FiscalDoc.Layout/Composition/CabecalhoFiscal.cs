@@ -71,9 +71,15 @@ public static class CabecalhoFiscal
         float larguraQr = d.QrCode is null ? 0f : alturaTopo + alturaFaixa;
         float largura = m.Largura - larguraQr;
 
+        // O codigo e montado antes da divisao das colunas porque e ele quem
+        // diz quanto a da chave precisa: com letra no CNPJ sao ate 385 modulos,
+        // contra 297 da chave so de digitos (NT Conjunta 2025.001, item 6).
+        IReadOnlyList<int>? barras = d.Chave is null ? null : Code128.Codificar(d.Chave.Caracteres);
+        int modulos = barras?.Sum() ?? Code128.TotalModulos(44);
+
         (float larguraEmit, float larguraId) = d.QrCode is null
-            ? (largura * 0.42f, largura * 0.20f)
-            : DividirComQr(largura);
+            ? DividirSemQr(largura, modulos)
+            : DividirComQr(largura, modulos);
 
         float larguraChave = largura - larguraEmit - larguraId;
 
@@ -158,16 +164,12 @@ public static class CabecalhoFiscal
         var caixaBarras = new RetanguloMm(x3, y, larguraChave, AlturaBarras + 3f);
         c.Moldura(caixaBarras);
 
-        if (d.Chave is not null)
+        if (barras is not null)
         {
-            IReadOnlyList<int> modulos = Code128C.Codificar(d.Chave.Digitos);
-
             // A caixa e mais larga que o necessario; limita o codigo ao que o
             // modulo maximo de 0,03 cm permite, para nao esticar a barra alem
             // do que a norma admite.
-            float larguraMaxima = Math.Min(
-                caixaBarras.Largura - 3f,
-                ModuloMaximo * Code128C.TotalModulos(44));
+            float larguraMaxima = Math.Min(caixaBarras.Largura - 3f, ModuloMaximo * modulos);
 
             var area = new RetanguloMm(
                 caixaBarras.X + ((caixaBarras.Largura - larguraMaxima) / 2f),
@@ -175,7 +177,7 @@ public static class CabecalhoFiscal
                 larguraMaxima,
                 AlturaBarras);
 
-            c.Barras(area, modulos, ModuloMinimo);
+            c.Barras(area, barras, ModuloMinimo);
         }
 
         var caixaChave = new RetanguloMm(x3, caixaBarras.Base, larguraChave, 7.5f);
@@ -225,22 +227,42 @@ public static class CabecalhoFiscal
     }
 
     /// <summary>
+    /// Divisao da largura sem QR Code: 42 % para o emitente, 20 % para a
+    /// identificacao e o resto para a chave. A chave com letra no CNPJ pode
+    /// pedir mais que esse resto no retrato - no pior caso, 385 modulos no
+    /// minimo de 0,02 cm, mais o respiro, sao 80 mm -, e o que falta sai do
+    /// emitente. Com a chave so de digitos a divisao e a de sempre, milimetro
+    /// por milimetro.
+    /// </summary>
+    private static (float Emitente, float Identificacao) DividirSemQr(float largura, int modulos)
+    {
+        float emitente = largura * 0.42f;
+        float id = largura * 0.20f;
+        float falta = LarguraMinimaChave(modulos) - (largura - emitente - id);
+
+        return (falta > 0f ? emitente - falta : emitente, id);
+    }
+
+    /// <summary>
     /// Divisao da largura quando o QR Code toma a sua coluna. A proporcao de
     /// sempre espremeria o codigo de barras abaixo do modulo minimo no
     /// retrato; por isso a coluna da chave recebe primeiro o que o codigo
     /// precisa - entre o modulo minimo e o maximo, mais o respiro de 3 mm -,
     /// e o emitente fica com o resto.
     /// </summary>
-    private static (float Emitente, float Identificacao) DividirComQr(float largura)
+    private static (float Emitente, float Identificacao) DividirComQr(float largura, int modulos)
     {
-        float minima = (ModuloMinimo * Code128C.TotalModulos(44)) + 3f;
-        float maxima = (ModuloMaximo * Code128C.TotalModulos(44)) + 3f;
+        float minima = LarguraMinimaChave(modulos);
+        float maxima = (ModuloMaximo * modulos) + 3f;
 
         float chave = Math.Clamp(largura * 0.40f, minima, maxima);
         float id = Math.Clamp(largura * 0.20f, 30f, 55f);
 
         return (largura - chave - id, id);
     }
+
+    /// <summary>O codigo inteiro no modulo minimo, mais 1,5 mm de respiro de cada lado.</summary>
+    private static float LarguraMinimaChave(int modulos) => (ModuloMinimo * modulos) + 3f;
 
     /// <summary>
     /// Quantas linhas a razao social ocupa, ate tres: o xNome tem no maximo 60

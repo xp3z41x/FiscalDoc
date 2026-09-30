@@ -18,7 +18,7 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
-from anonimizar import anonimizar  # noqa: E402
+from anonimizar import anonimizar, cnpj_alfanumerico_ficticio  # noqa: E402
 
 RAIZ = pathlib.Path(__file__).resolve().parent.parent
 DESTINO = RAIZ / "tests" / "Amostras"
@@ -29,10 +29,14 @@ NS_NFE = "http://www.portalfiscal.inf.br/nfe"
 
 
 def dv(chave43: str) -> int:
-    """Modulo 11 do MOC: pesos 2..9 ciclicos, da direita para a esquerda."""
+    """
+    Modulo 11 do MOC: pesos 2..9 ciclicos, da direita para a esquerda, sobre o
+    valor ASCII - 48 de cada caractere - que e o proprio digito, e de 17 a 42
+    para as letras do CNPJ alfanumerico (NT Conjunta 2025.001, item 5).
+    """
     soma, peso = 0, 2
     for c in reversed(chave43):
-        soma += int(c) * peso
+        soma += (ord(c) - 48) * peso
         peso = 2 if peso == 9 else peso + 1
     resto = soma % 11
     return 0 if resto in (0, 1) else 11 - resto
@@ -42,6 +46,17 @@ def chave(cuf, aamm, cnpj, mod, serie, numero, tpemis, cnf) -> str:
     base = f"{cuf}{aamm}{cnpj}{mod}{serie:0>3}{numero:0>9}{tpemis}{cnf:0>8}"
     assert len(base) == 43, len(base)
     return base + str(dv(base))
+
+
+def alfanumerico(xml: str, cnpjs: tuple[str, ...]) -> str:
+    """
+    Troca cada CNPJ numerico dado por um alfanumerico em todo o documento - na
+    tag e dentro de toda chave de acesso que o carrega. O DV dessas chaves fica
+    para a anonimizacao, que refaz o de toda chave que encontra.
+    """
+    for i, cnpj in enumerate(cnpjs):
+        xml = xml.replace(cnpj, cnpj_alfanumerico_ficticio(i))
+    return xml
 
 
 def escrever(nome: str, conteudo: str) -> None:
@@ -233,12 +248,13 @@ def cte_montar(nome: str, *, numero: int, tpimp: str = "2", tpcte: str = "0",
                xdetretira: str = "", globalizado: bool = False,
                toma: str = "<toma3><toma>3</toma></toma3>", compl: str = "",
                participantes: str = "", vprest: str = "", imp: str = "",
-               imp_extra: str = "", vtottrib: str = "418.40", corpo: str = "") -> None:
+               imp_extra: str = "", vtottrib: str = "418.40", corpo: str = "",
+               cnpj_alfanumerico: tuple[str, ...] = ()) -> None:
     ch = ct(numero)
     det_retira = f"<xDetRetira>{xdetretira}</xDetRetira>" if xdetretira else ""
     glob = "<indGlobalizado>1</indGlobalizado>" if globalizado else ""
 
-    escrever(nome, f"""<?xml version="1.0" encoding="UTF-8"?>
+    escrever(nome, alfanumerico(f"""<?xml version="1.0" encoding="UTF-8"?>
 <cteProc versao="4.00" xmlns="{NS_CTE}">
 <CTe xmlns="{NS_CTE}"><infCte versao="4.00" Id="CTe{ch}">
 <ide><cUF>41</cUF><cCT>{ch[35:43]}</cCT><CFOP>6352</CFOP>
@@ -267,7 +283,7 @@ def cte_montar(nome: str, *, numero: int, tpimp: str = "2", tpcte: str = "0",
 <nProt>141260378123456</nProt><digVal>abc123</digVal><cStat>100</cStat>
 <xMotivo>Autorizado o uso do CT-e</xMotivo></infProt></protCTe>
 </cteProc>
-""")
+""", cnpj_alfanumerico))
 
 
 def cte_subcontratacao(nome: str) -> None:
@@ -423,9 +439,27 @@ def cte_multimodal(nome: str) -> None:
         corpo=f"""<infCTeNorm>{CARGA.format(xoutcat='')}{docs_nfe(294040)}{multimodal}</infCTeNorm>""")
 
 
+def cte_cnpj_alfanumerico(nome: str) -> None:
+    """
+    Emitente, remetente e destinatario com CNPJ alfanumerico (IN RFB
+    2.229/2024), em retrato. A chave do CT-e e as das NF-e transportadas trazem
+    letras nas posicoes do CNPJ (NT Conjunta 2025.001, item 5): o codigo de
+    barras sai no modelo hibrido 128C/128A, e o CNPJ/CPF EMITENTE dos
+    documentos originarios sai da chave de cada nota, com as letras.
+
+    Retrato porque e onde a coluna da chave e mais estreita - e o codigo com
+    letras, mais comprido que o so de digitos.
+    """
+    cte_montar(
+        nome, numero=91808, tpimp="1",
+        corpo=f"""<infCTeNorm>{CARGA.format(xoutcat='')}{docs_nfe(294050, 294051, 294052)}{rodo()}</infCTeNorm>""",
+        cnpj_alfanumerico=(CNPJ_EMIT, CNPJ_REM, CNPJ_DEST))
+
+
 # --------------------------------------------------------------- MDF-e ----
 
-def mdfe(nome: str, *, documentos: int, tpemis: str = "1") -> None:
+def mdfe(nome: str, *, documentos: int, tpemis: str = "1",
+         cnpj_alfanumerico: tuple[str, ...] = ()) -> None:
     ch = chave("41", "2609", "11222333000181", "58", 1, 5512, tpemis, 33440077)
 
     municipios = ["SAO PAULO", "CAMPINAS", "RIBEIRAO PRETO"]
@@ -449,7 +483,7 @@ def mdfe(nome: str, *, documentos: int, tpemis: str = "1") -> None:
         cont = ("<dhCont>2026-09-14T06:05:00-03:00</dhCont>"
                 "<xJust>Falha de comunicacao com o ambiente autorizador</xJust>")
 
-    escrever(nome, f"""<?xml version="1.0" encoding="UTF-8"?>
+    escrever(nome, alfanumerico(f"""<?xml version="1.0" encoding="UTF-8"?>
 <mdfeProc versao="3.00" xmlns="{NS_MDFE}">
 <MDFe xmlns="{NS_MDFE}"><infMDFe versao="3.00" Id="MDFe{ch}">
 <ide><cUF>41</cUF><tpAmb>1</tpAmb><tpEmit>1</tpEmit><tpTransp>1</tpTransp>
@@ -488,7 +522,7 @@ def mdfe(nome: str, *, documentos: int, tpemis: str = "1") -> None:
 <nProt>141260399887766</nProt><digVal>def456</digVal><cStat>100</cStat>
 <xMotivo>Autorizado o uso do MDF-e</xMotivo></infProt></protMDFe>
 </mdfeProc>
-""")
+""", cnpj_alfanumerico))
 
 
 # ------------------------------------------------------------- eventos ----
@@ -528,10 +562,10 @@ def evento_nfe_cce(nome: str) -> None:
 """)
 
 
-def evento_nfe_cancelamento(nome: str) -> None:
+def evento_nfe_cancelamento(nome: str, cnpj_alfanumerico: tuple[str, ...] = ()) -> None:
     ch = chave("41", "2609", "11222333000181", "55", 2, 39168, "1", 15203411)
 
-    escrever(nome, f"""<?xml version="1.0" encoding="UTF-8"?>
+    escrever(nome, alfanumerico(f"""<?xml version="1.0" encoding="UTF-8"?>
 <procEventoNFe versao="1.00" xmlns="{NS_NFE}">
 <evento versao="1.00"><infEvento Id="ID110111{ch}01">
 <cOrgao>41</cOrgao><tpAmb>1</tpAmb><CNPJ>11222333000181</CNPJ>
@@ -548,7 +582,7 @@ def evento_nfe_cancelamento(nome: str) -> None:
 <nSeqEvento>1</nSeqEvento><dhRegEvento>2026-09-18T16:10:22-03:00</dhRegEvento>
 <nProt>141260400998877</nProt></infEvento></retEvento>
 </procEventoNFe>
-""")
+""", cnpj_alfanumerico))
 
 
 def evento_cte(nome: str) -> None:
@@ -617,16 +651,24 @@ def main() -> None:
     cte_ferroviario("cte-400-ferroviario.xml")
     cte_dutoviario("cte-400-dutoviario.xml")
     cte_multimodal("cte-400-multimodal.xml")
+    cte_cnpj_alfanumerico("cte-400-cnpj-alfanumerico.xml")
 
     print("MDF-e:")
     mdfe("mdfe-300-rodoviario.xml", documentos=9)
     mdfe("mdfe-300-muitos-documentos.xml", documentos=90)
     mdfe("mdfe-300-contingencia.xml", documentos=6, tpemis="2")
+    # Emitente e emitente das NF-e com letras: a chave do MDF-e e todas as
+    # chaves da lista de documentos saem alfanumericas.
+    mdfe("mdfe-300-cnpj-alfanumerico.xml", documentos=6,
+         cnpj_alfanumerico=("11222333000181", "12222333000148"))
 
     print("Eventos:")
     evento_nfe_cce("evento-nfe-cce.xml")
     evento_nfe_cancelamento("evento-nfe-cancelamento.xml")
     evento_cte("evento-cte-entrega.xml")
+    # Autor e chave da NF-e cancelada com letras no CNPJ.
+    evento_nfe_cancelamento("evento-nfe-cnpj-alfanumerico.xml",
+                            cnpj_alfanumerico=("11222333000181",))
 
     print("Deve ser recusado:")
     cte_os("recusar-modelo67-cteos.xml")

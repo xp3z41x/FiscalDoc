@@ -589,7 +589,10 @@ public static class DanfeRetrato
             return;
         }
 
-        IReadOnlyList<int> modulos = Code128C.Codificar(nfe.Chave.Digitos);
+        // Com letra no CNPJ o codigo cresce: ate 385 modulos, contra 297 da
+        // chave so de digitos. No modulo minimo de 0,02 cm sao 77,0 mm, e a
+        // caixa do MOC da 77,3 - cabe sem mexer na geometria.
+        IReadOnlyList<int> modulos = Code128.Codificar(nfe.Chave.Caracteres);
 
         float altura = Math.Min(DanfeMetricas.AlturaBarras, caixa.Altura - 3f);
         var area = new RetanguloMm(

@@ -181,7 +181,7 @@ public sealed class ChaveAcessoTests
         Assert.Equal(54, f.Length); // 44 digitos + 10 espacos
         Assert.Equal(11, f.Split(' ').Length);
         Assert.All(f.Split(' '), grupo => Assert.Equal(4, grupo.Length));
-        Assert.Equal(c.Digitos, f.Replace(" ", string.Empty, StringComparison.Ordinal));
+        Assert.Equal(c.Caracteres, f.Replace(" ", string.Empty, StringComparison.Ordinal));
     }
 
     [Fact]
