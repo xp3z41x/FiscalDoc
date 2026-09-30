@@ -9,18 +9,20 @@ namespace FiscalDoc.Layout.Damdfe;
 /// DAMDFE - representacao grafica do MDF-e modelo 58.
 ///
 /// <para>Vale o mesmo aviso do DACTE: o MOC do MDF-e 3.00b Anexo II <b>nao
-/// traz coordenadas, fontes nem margens</b> - a secao 2.7.1 diz literalmente
+/// traz coordenadas, fontes nem margens</b> - a secao 2.6.1 diz literalmente
 /// so que se usa "papel comum nas orientacoes retrato ou paisagem", e os
-/// modelos da secao 2.8 sao imagens. Este layout entrega os blocos do modelo
+/// modelos da secao 2.7 sao imagens. Este layout entrega os blocos do modelo
 /// oficial, na ordem dele, legiveis.</para>
 ///
 /// <para>Duas regras do MOC que <b>sao</b> normativas e estao implementadas:
-/// 2.5 obriga "EMISSÃO EM CONTINGÊNCIA" em destaque no lugar do protocolo, e
-/// 2.6 obriga a frase de homologacao centralizada e em caixa alta na mesma
+/// 2.4 obriga "EMISSÃO EM CONTINGÊNCIA" em destaque no lugar do protocolo, e
+/// 2.5 obriga a frase de homologacao centralizada e em caixa alta na mesma
 /// area. Ambas ficam em <see cref="CabecalhoFiscal"/>.</para>
 ///
-/// <para>Retrato por padrao: a lista de documentos vinculados e vertical e
-/// longa, e e o que o motorista precisa conferir na estrada.</para>
+/// <para>Sempre em retrato. O MDF-e nao tem tpImp, e a 2.6.1 admite as duas
+/// orientacoes sem dizer quem escolhe; os oito modelos da 2.7 sao em pe, e a
+/// lista de documentos vinculados e vertical e longa - e o que o motorista
+/// precisa conferir na estrada.</para>
 /// </summary>
 public static class DamdfeLayout
 {
@@ -33,9 +35,8 @@ public static class DamdfeLayout
         ArgumentNullException.ThrowIfNull(medidor);
 
         EstilosDanfe e = estilos ?? new EstilosDanfe();
-        TamanhoPapel papel = mdfe.Paisagem ? TamanhoPapel.A4.Girado : TamanhoPapel.A4;
 
-        var m = new MontadorDocumento(papel, MargemMm, e, medidor)
+        var m = new MontadorDocumento(TamanhoPapel.A4, MargemMm, e, medidor)
         {
             AlturaLinha = 7.8f,
             AlturaSecao = 4.4f,
@@ -56,7 +57,7 @@ public static class DamdfeLayout
             Protocolo: mdfe.Protocolo,
             ExigeSemValorFiscal: mdfe.ExigeSemValorFiscal,
 
-            // MOC MDF-e 2.5: texto proprio, em destaque, no lugar do protocolo.
+            // MOC MDF-e 2.4: texto proprio, em destaque, no lugar do protocolo.
             DizerContingencia: mdfe.EmContingencia ? "EMISSÃO EM CONTINGÊNCIA" : null,
             TextoConsulta: "www.mdfe-portal.sefaz.rs.gov.br");
 
@@ -171,18 +172,19 @@ public static class DamdfeLayout
 
         if (mdfe.EmContingencia)
         {
-            // MOC 2.5: a transmissao deve ocorrer em ate 168 horas da emissao.
-            partes.Add("EMISSÃO EM CONTINGÊNCIA - transmissão obrigatória em até 168 horas.");
+            // A frase dos quatro modelos de contingencia (MOC MDF-e 3.00b,
+            // Anexo II, 2.7.2, 2.7.4, 2.7.6 e 2.7.8). Os modelos a poem na
+            // caixa do protocolo; aqui ela vem para as observacoes, e a caixa
+            // fica com o dizer curto da 2.4. As 168 horas contam da emissao
+            // (2.4), e dhEmi e a unica data que o MDF-e tem para isso - o
+            // leiaute nao tem dhCont nem xJust.
+            string quando = mdfe.DataHoraEmissao is { } dh
+                ? $" ({Formatos.DataHora(dh)})"
+                : string.Empty;
 
-            if (mdfe.DataHoraContingencia is { } dh)
-            {
-                partes.Add($"Início da contingência: {Formatos.DataHora(dh)}");
-            }
-
-            if (!string.IsNullOrWhiteSpace(mdfe.JustificativaContingencia))
-            {
-                partes.Add($"Motivo: {mdfe.JustificativaContingencia}");
-            }
+            partes.Add(
+                "EMISSÃO EM CONTINGÊNCIA. Obrigatória a autorização em 168 horas "
+                + $"após esta emissão{quando}");
         }
 
         if (!string.IsNullOrWhiteSpace(mdfe.Observacoes))

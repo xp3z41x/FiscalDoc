@@ -179,11 +179,27 @@ public sealed class TransporteTests
     public void Mdfe_em_contingencia_exige_o_dizer_do_moc()
     {
         MdfeDocumento m = Ler<MdfeDocumento>("mdfe-300-contingencia.xml");
-
-        // MOC MDF-e 2.5: "EMISSÃO EM CONTINGÊNCIA" em destaque, no lugar
-        // reservado ao protocolo.
         Assert.True(m.EmContingencia);
-        Assert.NotNull(m.JustificativaContingencia);
+
+        ConjuntoPaginas c = DamdfeLayout.Construir(m, new MedidorTextoWpf());
+        var textos = c.Paginas[0].Primitivas.OfType<Primitiva.Texto>()
+            .Select(t => t.Conteudo)
+            .ToList();
+
+        // MOC MDF-e 3.00b, Anexo II, 2.4: "EMISSÃO EM CONTINGÊNCIA" em
+        // destaque, no lugar reservado ao protocolo.
+        Assert.Contains("EMISSÃO EM CONTINGÊNCIA", textos);
+
+        // Nas observacoes, a frase dos modelos de contingencia (2.7.2) com a
+        // unica data que ela cita: a da emissao, de onde contam as 168 horas.
+        // O MDF-e nao tem dhCont nem xJust; 14/09/2026 08:40:11 e o dhEmi da
+        // amostra.
+        string observacoes = Assert.Single(
+            textos, t => t.StartsWith("EMISSÃO EM CONTINGÊNCIA.", StringComparison.Ordinal));
+
+        Assert.Equal(
+            "EMISSÃO EM CONTINGÊNCIA. Obrigatória a autorização em 168 horas após esta emissão (14/09/2026 08:40:11)",
+            observacoes.Split('\n')[0]);
     }
 
     // ============================================================= eventos

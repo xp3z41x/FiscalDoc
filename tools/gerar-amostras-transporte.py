@@ -478,10 +478,10 @@ def mdfe(nome: str, *, documentos: int, tpemis: str = "1",
             f"<infMunDescarga><cMunDescarga>{cod}</cMunDescarga>"
             f"<xMunDescarga>{mun}</xMunDescarga>{''.join(chaves)}</infMunDescarga>")
 
-    cont = ""
-    if tpemis != "1":
-        cont = ("<dhCont>2026-09-14T06:05:00-03:00</dhCont>"
-                "<xJust>Falha de comunicacao com o ambiente autorizador</xJust>")
+    # Diferente do CT-e acima, o ide do MDF-e nao tem dhCont nem xJust (nem
+    # tpImp): a contingencia off-line muda so o tpEmis, a chave e o QR Code
+    # (MOC MDF-e 3.00b, Visao Geral, 11.1). Os dois copiados do CT-e deixavam
+    # a amostra de contingencia invalida no schema.
 
     escrever(nome, alfanumerico(f"""<?xml version="1.0" encoding="UTF-8"?>
 <mdfeProc versao="3.00" xmlns="{NS_MDFE}">
@@ -490,7 +490,7 @@ def mdfe(nome: str, *, documentos: int, tpemis: str = "1",
 <mod>58</mod><serie>1</serie><nMDF>5512</nMDF><cMDF>33440077</cMDF>
 <cDV>{ch[-1]}</cDV><modal>1</modal>
 <dhEmi>2026-09-14T08:40:11-03:00</dhEmi><tpEmis>{tpemis}</tpEmis>
-<procEmi>0</procEmi><verProc>3.0.2</verProc>{cont}
+<procEmi>0</procEmi><verProc>3.0.2</verProc>
 <UFIni>PR</UFIni><UFFim>SP</UFFim>
 <infMunCarrega><cMunCarrega>4106902</cMunCarrega><xMunCarrega>CURITIBA</xMunCarrega></infMunCarrega>
 <infPercurso><UFPer>SP</UFPer></infPercurso>

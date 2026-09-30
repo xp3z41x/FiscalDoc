@@ -35,7 +35,6 @@ internal static class MdfeParser
             DataHoraEmissao: ide.DataHora("dhEmi"),
             Modal: (ModalMdfe)(ide.Int("modal") ?? 1),
             TipoEmitente: (TipoEmitenteMdfe)(ide.Int("tpEmit") ?? 1),
-            TipoImpressao: (TipoImpressao)(ide.Int("tpImp") ?? 1),
             TipoEmissao: (TipoEmissao)(ide.Int("tpEmis") ?? 1),
             Ambiente: XEl.LerAmbiente(ide.Int("tpAmb")),
             UfInicio: ide.Str("UFIni"),
@@ -52,8 +51,6 @@ internal static class MdfeParser
             Lacres: LerLacres(inf),
             ProdutoPredominante: inf.Desce("prodPred").Str("xProd"),
             Observacoes: inf.Desce("infAdic").Str("infCpl"),
-            DataHoraContingencia: ide.DataHora("dhCont"),
-            JustificativaContingencia: ide.Str("xJust"),
             Protocolo: LerProtocolo(raiz.Desce("protMDFe", "infProt")));
 
         return new ResultadoLeitura.Ok(doc);

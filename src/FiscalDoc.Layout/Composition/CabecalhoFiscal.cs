@@ -281,8 +281,8 @@ public static class CabecalhoFiscal
 
     /// <summary>
     /// Area do protocolo. E aqui que moram as tres mensagens obrigatorias:
-    /// homologacao (MOC CT-e 2.20 e MDF-e 2.6, centralizada e em caixa alta),
-    /// contingencia do MDF-e (2.5, "EMISSÃO EM CONTINGÊNCIA" em destaque) e,
+    /// homologacao (MOC CT-e 2.20 e MDF-e 2.5, centralizada e em caixa alta),
+    /// contingencia do MDF-e (2.4, "EMISSÃO EM CONTINGÊNCIA" em destaque) e,
     /// no caso normal, o protocolo de autorizacao.
     /// </summary>
     private static void DesenharProtocolo(

@@ -18,7 +18,7 @@ proper accents (`INSCRIÇÃO`, not `INSCRICAO`); they are a fiscal document.
 
 ```bash
 dotnet build -c Release                       # 0 warnings required (TreatWarningsAsErrors)
-dotnet test tests/FiscalDoc.Tests -c Release  # 444 tests (252 + 62 skipped without the real corpus)
+dotnet test tests/FiscalDoc.Tests -c Release  # 445 tests (253 + 62 skipped without the real corpus)
 ```
 
 Single test class / single test:
@@ -106,7 +106,10 @@ Which layout a document gets is decided in `AberturaDocumento`, and for the
 NF-e family it is decided by **`mod`, not `tpImp`**: model 65 always goes to
 `DanfeNfce`, model 55 to `DanfeRetrato`/`DanfePaisagem` according to `tpImp`.
 A model-65 file whose `tpImp` is 5 ("mensagem eletrônica") or out of range is
-still a coupon.
+still a coupon. The DAMDFE has no such choice: the MDF-e `ide` has no `tpImp`
+— nor the `dhCont`/`xJust` that the CT-e and NF-e carry — so it is always A4
+portrait, like the eight models of Anexo II §2.7, and its only contingency
+date is `dhEmi`, from which §2.4 counts the 168 hours.
 
 ### The layer boundary is enforced by the compiler
 
@@ -291,7 +294,7 @@ this governs how much fidelity can honestly be claimed:
 | **DANFE** (NF-e) | MOC 7.00 Anexo II publishes a full field-by-field coordinate table in cm, plus minimum font sizes (§3.7) |
 | **DANFE NFC-e** | Own manual (ENCAT, *Especificações Técnicas do DANFE NFC-e e QR Code*, v6.0 mar/2025): nine ordered **divisions**, verbatim wording, minimum paper width and QR size — but **no coordinates and no font sizes**, and it says outright that item-detail positions "não são reguladas" |
 | **DACTE** (CT-e) | Manual has **figures only** — no coordinates, no fonts, no margins |
-| **DAMDFE** (MDF-e) | Same: §2.7.1 says only "papel comum, retrato ou paisagem" |
+| **DAMDFE** (MDF-e) | Same: §2.6.1 says only "papel comum, retrato ou paisagem" — the one size it fixes is the QR Code's (§2.3, §2.6.2) |
 | **Events** | **No mandatory graphical representation exists in any MOC** |
 | **IBS/CBS** (Reforma) | NT 2025.002-RTC §9 says the DANFE changes are *"em estudo"*. Nothing published. |
 

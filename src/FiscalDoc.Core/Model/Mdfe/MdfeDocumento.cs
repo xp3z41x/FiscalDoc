@@ -72,7 +72,14 @@ public sealed record TotaisMdfe(
     string? UnidadeMedida,
     decimal? PesoCarga);
 
-/// <summary>MDF-e modelo 58, leiaute 3.00.</summary>
+/// <summary>
+/// MDF-e modelo 58, leiaute 3.00.
+///
+/// <para>Diferente do CT-e e da NF-e, o ide do MDF-e não tem <c>tpImp</c>,
+/// <c>dhCont</c> nem <c>xJust</c> (MOC 3.00b, Anexo I, campos 4 a 28): a
+/// orientação do DAMDFE não vem no arquivo, e a contingência off-line muda só
+/// o <c>tpEmis</c>, a chave e o QR Code (Visão Geral, 11.1).</para>
+/// </summary>
 public sealed record MdfeDocumento(
     ChaveAcesso? Chave,
     string? VersaoLeiaute,
@@ -81,7 +88,6 @@ public sealed record MdfeDocumento(
     DateTimeOffset? DataHoraEmissao,
     ModalMdfe Modal,
     TipoEmitenteMdfe TipoEmitente,
-    TipoImpressao TipoImpressao,
     TipoEmissao TipoEmissao,
     Ambiente Ambiente,
     string? UfInicio,
@@ -98,8 +104,6 @@ public sealed record MdfeDocumento(
     IReadOnlyList<string> Lacres,
     string? ProdutoPredominante,
     string? Observacoes,
-    DateTimeOffset? DataHoraContingencia,
-    string? JustificativaContingencia,
     Protocolo? Protocolo) : DocumentoFiscal
 {
     public override FamiliaDocumento Familia => FamiliaDocumento.Mdfe;
@@ -108,11 +112,11 @@ public sealed record MdfeDocumento(
 
     public bool SemProtocolo => Protocolo?.Numero is null;
 
-    /// <summary>MOC MDF-e 2.6: frase obrigatória na área do protocolo.</summary>
+    /// <summary>MOC MDF-e 3.00b, Anexo II, 2.5: frase obrigatória na área do protocolo.</summary>
     public bool ExigeSemValorFiscal => Ambiente == Ambiente.Homologacao;
 
     /// <summary>
-    /// MOC MDF-e 2.5: em contingência é obrigatório imprimir
+    /// MOC MDF-e 3.00b, Anexo II, 2.4: em contingência é obrigatório imprimir
     /// "EMISSÃO EM CONTINGÊNCIA", em destaque, no lugar reservado ao protocolo.
     ///
     /// <para>O domínio de <c>tpEmis</c> do MDF-e tem três valores, e só um
@@ -128,13 +132,6 @@ public sealed record MdfeDocumento(
     /// off-line. O nome do membro mente aqui; o numero, nao.</para>
     /// </summary>
     public bool EmContingencia => (int)TipoEmissao == 2;
-
-    /// <summary>
-    /// O MOC do MDF-e admite retrato e paisagem sem preferir nenhum
-    /// ("papel comum nas orientações retrato ou paisagem"). O retrato é o
-    /// praticado, porque a lista de documentos vinculados é vertical.
-    /// </summary>
-    public bool Paisagem => TipoImpressao == TipoImpressao.Paisagem;
 }
 
 /// <summary>Emitente do MDF-e.</summary>

@@ -106,6 +106,38 @@ public sealed class RoteamentoLayoutTests
     }
 
     /// <summary>
+    /// O MDF-e nao tem <c>tpImp</c> (MOC 3.00b, Anexo I, campos 4 a 28), e o
+    /// DAMDFE sai sempre em A4 em pe, como os oito modelos do Anexo II, 2.7.
+    /// Um <c>tpImp</c> 2 enfiado no ide - invalido no schema - nao deita a
+    /// folha: a orientacao nao e lida de um campo que o leiaute nao tem.
+    /// </summary>
+    [Fact]
+    public void Damdfe_sai_em_retrato_mesmo_com_tpImp_no_arquivo()
+    {
+        string fonte = File.ReadAllText(Amostras.Sintetica("mdfe-300-rodoviario.xml"));
+
+        string alterado = fonte.Replace("<tpEmis>", "<tpImp>2</tpImp><tpEmis>", StringComparison.Ordinal);
+
+        Assert.Contains("<tpImp>2</tpImp>", alterado, StringComparison.Ordinal);
+
+        string temporario = Path.Combine(Path.GetTempPath(), $"fiscaldoc-{Guid.NewGuid():N}.xml");
+        File.WriteAllText(temporario, alterado);
+
+        try
+        {
+            ConjuntoPaginas c = Abrir(temporario);
+
+            Assert.True(
+                c.Papel.AlturaMm > c.Papel.LarguraMm,
+                $"o DAMDFE saiu com papel de {c.Papel.LarguraMm:0.#} x {c.Papel.AlturaMm:0.#} mm");
+        }
+        finally
+        {
+            File.Delete(temporario);
+        }
+    }
+
+    /// <summary>
     /// Um arquivo ilegivel vira mensagem na tela, nunca excecao que escapa -
     /// e o contrato que o <c>ParseResult</c> declara.
     /// </summary>

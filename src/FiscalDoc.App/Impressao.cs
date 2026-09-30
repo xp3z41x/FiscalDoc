@@ -115,7 +115,7 @@ internal sealed class Impressao
     /// <summary>
     /// Escolhe orientacao e papel <b>da lista do driver</b>.
     ///
-    /// <para>O documento em paisagem - DANFE tpImp 2, DACTE, DAMDFE - pede
+    /// <para>O documento em paisagem - DANFE ou DACTE com tpImp 2 - pede
     /// uma folha de 297 x 210 mm. O driver <b>nao lista papel deitado</b>: a
     /// lista e sempre em retrato, e quem deita a folha e a orientacao. Por
     /// isso a procura e feita com as medidas giradas. Sem isso nenhum papel
