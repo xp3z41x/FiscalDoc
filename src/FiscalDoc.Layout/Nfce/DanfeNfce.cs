@@ -117,8 +117,8 @@ public static class DanfeNfce
 
     /// <summary>
     /// Lado do quadrado do QR Code, margem clara inclusa. A conta que leva aos
-    /// 34 mm esta em <see cref="QrCode.LadoCaixaImpressaMm"/>: o manual do
-    /// DACTE pede o mesmo minimo, e a medida e uma so.
+    /// 34 mm esta em <see cref="QrCode.LadoCaixaImpressaMm"/>: os manuais do
+    /// DACTE e do DAMDFE pedem o mesmo minimo, e a medida e uma so.
     /// </summary>
     private const float LadoQrMm = QrCode.LadoCaixaImpressaMm;
 

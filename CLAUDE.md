@@ -18,7 +18,7 @@ proper accents (`INSCRIÇÃO`, not `INSCRICAO`); they are a fiscal document.
 
 ```bash
 dotnet build -c Release                       # 0 warnings required (TreatWarningsAsErrors)
-dotnet test tests/FiscalDoc.Tests -c Release  # 445 tests (253 + 62 skipped without the real corpus)
+dotnet test tests/FiscalDoc.Tests -c Release  # 460 tests (268 + 62 skipped without the real corpus)
 ```
 
 Single test class / single test:
@@ -328,6 +328,16 @@ Consequences baked into the code:
   them: cobrança, previsão de entrega, características adicionais, ordens de
   coleta; IBS/CBS copies the DANFE's block. No canhoto — optional in §2.21.5,
   and it serves whoever delivers the cargo, not whoever receives the CT-e.
+- **The DAMDFE's QR Code is normative too.** MOC MDF-e 3.00b Anexo II §2.3
+  and §2.6.2 require ≥ 25 × 25 mm, and all eight models of §2.7 (four modals,
+  normal and contingency) draw it top-right in the header — the DACTE's
+  column, through the same `DadosCabecalho.QrCode` and
+  `CabecalhoFiscal.CodificarQr`. In contingency the URL carries `sign` (344
+  characters with a 2048-bit certificate) and the symbol grows from version 6
+  to 17: at 300 dpi the module floors to three dots, leaving a 27,3 mm image
+  around 21,7 mm of content. That still meets the manual's 25 mm, and
+  `DamdfeTests` measures it in ink at 300 dpi instead of trusting the 34 mm
+  box.
 - **DANFE retrato and paisagem are two separate layouts**, not one rotated. In
   paisagem the canhoto becomes a vertical strip on the left edge, block titles
   become 5,1 mm vertical tabs, and row height drops from 8,5 to 6,4 mm.
@@ -394,7 +404,10 @@ Consequences baked into the code:
   The CT-e set covers all six modals, complemento, substituto and a portrait
   subcontratação that carries nearly every optional group; `infCTeSupl` is a
   sibling of `infCte` there, as the schema has it (the first generator put it
-  inside, and the parser still accepts that).
+  inside, and the parser still accepts that). The MDF-e samples carry
+  `infMDFeSupl` beside `infMDFe` the same way; the contingency one has a
+  `sign` made of 256 deterministic bytes derived from the key — the length
+  and alphabet of a real signature, verifiable by no one.
 - `tests/Saida/` — the suite renders every document to PNG here (via
   `GeradorVisual`) for visual inspection. Gitignored. Look at these after
   changing any layout; assertions do not catch a crooked quadro.

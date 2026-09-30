@@ -51,6 +51,7 @@ internal static class MdfeParser
             Lacres: LerLacres(inf),
             ProdutoPredominante: inf.Desce("prodPred").Str("xProd"),
             Observacoes: inf.Desce("infAdic").Str("infCpl"),
+            QrCode: LerQrCode(raiz, inf),
             Protocolo: LerProtocolo(raiz.Desce("protMDFe", "infProt")));
 
         return new ResultadoLeitura.Ok(doc);
@@ -199,6 +200,19 @@ internal static class MdfeParser
 
         return lista;
     }
+
+    /// <summary>
+    /// QR Code do DAMDFE (infMDFeSupl/qrCodMDFe). O MOC do MDF-e 3.00b o exige
+    /// no DAMDFE da emissao normal e no da contingencia off-line (Visao Geral,
+    /// 9); na contingencia a URL traz tambem o parametro sign.
+    ///
+    /// <para>Pelo schema (PL_MDFe_300b, TMDFe) o grupo e irmao de infMDFe,
+    /// dentro de MDFe, antes da assinatura. Ele e procurado tambem dentro de
+    /// infMDFe pelo mesmo motivo do CT-e: um arquivo que o grave ali ainda traz
+    /// o QR Code - e quem so le nao ganha nada recusando-o.</para>
+    /// </summary>
+    private static string? LerQrCode(XElement raiz, XElement inf) =>
+        (DocumentSniffer.AcharInfo(raiz, "MDFe", "infMDFeSupl") ?? inf.El("infMDFeSupl")).Str("qrCodMDFe");
 
     private static Protocolo? LerProtocolo(XElement? p) => p is null
         ? null

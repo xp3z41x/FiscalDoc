@@ -104,6 +104,7 @@ public sealed record MdfeDocumento(
     IReadOnlyList<string> Lacres,
     string? ProdutoPredominante,
     string? Observacoes,
+    string? QrCode,
     Protocolo? Protocolo) : DocumentoFiscal
 {
     public override FamiliaDocumento Familia => FamiliaDocumento.Mdfe;

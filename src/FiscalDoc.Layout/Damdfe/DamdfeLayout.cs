@@ -14,10 +14,13 @@ namespace FiscalDoc.Layout.Damdfe;
 /// modelos da secao 2.7 sao imagens. Este layout entrega os blocos do modelo
 /// oficial, na ordem dele, legiveis.</para>
 ///
-/// <para>Duas regras do MOC que <b>sao</b> normativas e estao implementadas:
-/// 2.4 obriga "EMISSÃO EM CONTINGÊNCIA" em destaque no lugar do protocolo, e
-/// 2.5 obriga a frase de homologacao centralizada e em caixa alta na mesma
-/// area. Ambas ficam em <see cref="CabecalhoFiscal"/>.</para>
+/// <para>Tres regras do MOC que <b>sao</b> normativas e estao implementadas,
+/// todas em <see cref="CabecalhoFiscal"/>: 2.4 obriga "EMISSÃO EM
+/// CONTINGÊNCIA" em destaque no lugar do protocolo; 2.5 obriga a frase de
+/// homologacao centralizada e em caixa alta na mesma area; e 2.3 e 2.6.2
+/// obrigam o QR Code de qrCodMDFe com no minimo 25 x 25 mm - que os oito
+/// modelos da 2.7, os de contingencia inclusive, poem no canto superior
+/// direito do cabecalho.</para>
 ///
 /// <para>Sempre em retrato. O MDF-e nao tem tpImp, e a 2.6.1 admite as duas
 /// orientacoes sem dizer quem escolhe; os oito modelos da 2.7 sao em pe, e a
@@ -59,7 +62,11 @@ public static class DamdfeLayout
 
             // MOC MDF-e 2.4: texto proprio, em destaque, no lugar do protocolo.
             DizerContingencia: mdfe.EmContingencia ? "EMISSÃO EM CONTINGÊNCIA" : null,
-            TextoConsulta: "www.mdfe-portal.sefaz.rs.gov.br");
+            TextoConsulta: "www.mdfe-portal.sefaz.rs.gov.br",
+
+            // MOC MDF-e 2.3: o QR Code sai do conteudo de qrCodMDFe. O
+            // cabecalho se repete em toda folha, e o simbolo vai junto.
+            QrCode: CabecalhoFiscal.CodificarQr(mdfe.QrCode));
 
         return m.Montar(
             MontarBlocos(mdfe),

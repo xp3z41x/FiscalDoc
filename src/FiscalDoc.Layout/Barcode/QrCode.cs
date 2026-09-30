@@ -37,7 +37,9 @@ public sealed class MatrizQr
     /// <para>Duas exigencias se somam aqui. A ISO/IEC 18004 manda 4 modulos.
     /// O Manual de Especificacoes Tecnicas do DANFE NFC-e (v6.0, item 3.2)
     /// manda 3 mm numa imagem de 25 mm e, "para dimensoes superiores a 25mm,
-    /// considerar a margem segura de 10% da dimensao total".</para>
+    /// considerar a margem segura de 10% da dimensao total" - regra que o
+    /// manual do DAMDFE (MOC MDF-e 3.00b, Anexo II, 2.6.2) repete com as
+    /// mesmas palavras.</para>
     ///
     /// <para>10% da dimensao total de cada lado quer dizer
     /// <c>q / (n + 2q) &gt;= 0,10</c>, ou seja <c>q &gt;= n/8</c>. O valor
@@ -53,9 +55,11 @@ public sealed class MatrizQr
 ///
 /// <para><b>Por que so o nivel M.</b> O Manual de Especificacoes Tecnicas do
 /// DANFE NFC-e (v6.0, item 5.2.2) e categorico: "Para o QR Code do DANFE
-/// NFC-e sera utilizado Nivel M". Implementar os quatro niveis exigiria
-/// transcrever mais 120 numeros de tabela que nunca seriam exercitados - e
-/// cada numero transcrito e um erro possivel.</para>
+/// NFC-e sera utilizado Nivel M". O do MDF-e diz o mesmo do DAMDFE, e
+/// tambem pede UTF-8 (MOC MDF-e 3.00b, Visao Geral, 9.3.2 e 9.3.3).
+/// Implementar os quatro niveis exigiria transcrever mais 120 numeros de
+/// tabela que nunca seriam exercitados - e cada numero transcrito e um erro
+/// possivel.</para>
 ///
 /// <para><b>Por que modo binario em UTF-8.</b> Mesmo manual, item 5.2.3:
 /// "Para o QR Code da NFC-e sera utilizada a opcao 2 - UTF-8". A URL do
@@ -73,15 +77,24 @@ public static class QrCode
     /// <summary>
     /// Lado da caixa do QR Code impresso, margem clara inclusa.
     ///
-    /// <para>Os dois manuais que pedem QR Code no papel pedem a mesma coisa:
+    /// <para>Os tres manuais que pedem QR Code no papel pedem a mesma coisa:
     /// "no minimo 25 x 25 mm, sendo 22 mm de conteudo para 3 mm de margem
-    /// segura" - o do DANFE NFC-e e o do DACTE (MOC CT-e 4.00, Anexo II,
-    /// 2.18.1). A caixa e maior que o minimo por causa da quantizacao: o
-    /// renderizador arredonda a largura do modulo <b>para baixo</b>, em pontos
-    /// inteiros do dispositivo, para nunca estourar a caixa - e a 300 dpi isso
-    /// custa ate um ponto por modulo. Com 34 mm, o simbolo impresso fica em
-    /// torno de 25 mm de conteudo mesmo depois da perda, e continua acima dos
-    /// 22 mm que os manuais pedem.</para>
+    /// segura" - o do DANFE NFC-e, o do DACTE (MOC CT-e 4.00, Anexo II,
+    /// 2.18.1) e o do DAMDFE (MOC MDF-e 3.00b, Anexo II, 2.3 e 2.6.2). A
+    /// caixa e maior que o minimo por causa da quantizacao: o renderizador
+    /// arredonda a largura do modulo <b>para baixo</b>, em pontos inteiros do
+    /// dispositivo, para nunca estourar a caixa - e a 300 dpi isso custa ate
+    /// um ponto por modulo. Com 34 mm, o simbolo de uma URL curta - o da
+    /// NFC-e, e o do DACTE e o do DAMDFE em emissao normal - fica em torno de
+    /// 25 mm de conteudo mesmo depois da perda, e continua acima dos 22 mm que
+    /// os manuais pedem.</para>
+    ///
+    /// <para>A excecao, medida, e o DAMDFE em contingencia: a URL carrega a
+    /// assinatura da chave (sign, 344 caracteres com certificado de 2048 bits)
+    /// e o simbolo sobe da versao 6 para a 17. A 300 dpi o modulo cai para
+    /// tres pontos, e sobram 21,7 mm de conteudo numa imagem de 27,3 mm - que
+    /// e o que o manual mede: acima dos 25 mm, com a margem de 10% que ele pede
+    /// para imagem maior que isso. <c>DamdfeTests</c> mede a tinta a 300 dpi.</para>
     /// </summary>
     public const float LadoCaixaImpressaMm = 34f;
 

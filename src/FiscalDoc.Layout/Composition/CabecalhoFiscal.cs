@@ -1,3 +1,4 @@
+using System.Text;
 using FiscalDoc.Core.Model.Nfe;
 using FiscalDoc.Core.Values;
 using FiscalDoc.Layout.Barcode;
@@ -32,8 +33,9 @@ public sealed record DadosCabecalho(
 ///
 /// <para>Com QR Code, o simbolo ganha uma coluna propria a direita, da altura
 /// do topo e da faixa de identificacao juntos - a posicao do modelo oficial do
-/// DACTE, que o repete em toda folha. Sem QR Code a geometria e a de sempre,
-/// milimetro por milimetro.</para>
+/// DACTE, que o repete em toda folha, e a dos oito modelos do DAMDFE (MOC
+/// MDF-e 3.00b, Anexo II, 2.7), todos com o QR no canto superior direito. Sem
+/// QR Code a geometria e a de sempre, milimetro por milimetro.</para>
 /// </summary>
 public static class CabecalhoFiscal
 {
@@ -49,6 +51,28 @@ public static class CabecalhoFiscal
     private const float ModuloMaximo = 0.3f;
 
     private const float ModuloMinimo = 0.2f;
+
+    /// <summary>
+    /// Matriz do QR Code do cabecalho, a partir do conteudo que veio no arquivo
+    /// (qrCodCTe, qrCodMDFe) - nunca recalculado. O manual do DACTE o poe no
+    /// campo 3 do cabecalho (MOC CT-e 4.00, Anexo II, 2.19.1), e o do DAMDFE o
+    /// exige com no minimo 25 x 25 mm (MOC MDF-e 3.00b, Anexo II, 2.3 e 2.6.2).
+    ///
+    /// <para>Um texto maior do que o maior simbolo comporta faria
+    /// <see cref="QrCode.Codificar"/> recusar. Diferente do cupom da NFC-e,
+    /// aqui o QR e um campo entre dezenas: perde-se o simbolo, e nao o
+    /// documento inteiro.</para>
+    /// </summary>
+    internal static MatrizQr? CodificarQr(string? conteudo)
+    {
+        if (string.IsNullOrWhiteSpace(conteudo)
+            || Encoding.UTF8.GetByteCount(conteudo) > QrCode.CapacidadeDadosBytes(40))
+        {
+            return null;
+        }
+
+        return QrCode.Codificar(conteudo);
+    }
 
     public static float Desenhar(
         Campo c,

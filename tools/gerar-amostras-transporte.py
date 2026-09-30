@@ -13,6 +13,8 @@ documentos reais - quando houver CT-e e MDF-e de verdade, vale repassar.
 Uso:  python tools/gerar-amostras-transporte.py
 """
 
+import base64
+import hashlib
 import pathlib
 import sys
 
@@ -457,6 +459,24 @@ def cte_cnpj_alfanumerico(nome: str) -> None:
 
 
 # --------------------------------------------------------------- MDF-e ----
+#
+# Ordem dos elementos: a do schema PL_MDFe_300b (TMDFe). infMDFeSupl e irmao
+# de infMDFe, dentro de MDFe e antes da assinatura - e nao filho dele.
+
+def assinatura_ficticia(chave44: str) -> str:
+    """
+    Parametro sign do QR Code em contingencia off-line. Na vida real e a
+    assinatura RSA-SHA1 da chave de acesso, em Base64, feita com o certificado
+    que assina o MDF-e (MOC MDF-e 3.00b, Visao Geral, 9.2.2).
+
+    Aqui sao 256 bytes deterministicos tirados da chave - o tamanho de uma
+    assinatura RSA de 2048 bits, que e o que um certificado A1 produz. Ninguem
+    consegue verifica-la, e nao e para isso que ela existe: existe para que o
+    QR de contingencia tenha o comprimento e o alfabeto de um de verdade.
+    """
+    bruto = b"".join(hashlib.sha256(f"{chave44}:{i}".encode()).digest() for i in range(8))
+    return base64.b64encode(bruto).decode("ascii")
+
 
 def mdfe(nome: str, *, documentos: int, tpemis: str = "1",
          cnpj_alfanumerico: tuple[str, ...] = ()) -> None:
@@ -482,6 +502,13 @@ def mdfe(nome: str, *, documentos: int, tpemis: str = "1",
     # tpImp): a contingencia off-line muda so o tpEmis, a chave e o QR Code
     # (MOC MDF-e 3.00b, Visao Geral, 11.1). Os dois copiados do CT-e deixavam
     # a amostra de contingencia invalida no schema.
+
+    # QR Code (Visao Geral, 9.2): URL do portal nacional, chMDFe e tpAmb. Na
+    # contingencia off-line vem tambem o sign; o Anexo I o exige ali (F117) e
+    # o proibe na emissao normal (F118).
+    qr = f"https://dfe-portal.svrs.rs.gov.br/mdfe/qrCode?chMDFe={ch}&amp;tpAmb=1"
+    if tpemis == "2":
+        qr += f"&amp;sign={assinatura_ficticia(ch)}"
 
     escrever(nome, alfanumerico(f"""<?xml version="1.0" encoding="UTF-8"?>
 <mdfeProc versao="3.00" xmlns="{NS_MDFE}">
@@ -516,7 +543,9 @@ def mdfe(nome: str, *, documentos: int, tpemis: str = "1",
 <lacres><nLacre>LAC0099123</nLacre></lacres>
 <lacres><nLacre>LAC0099124</nLacre></lacres>
 <infAdic><infCpl>Viagem programada para dois dias. Conferir lacres na chegada.</infCpl></infAdic>
-</infMDFe></MDFe>
+</infMDFe>
+<infMDFeSupl><qrCodMDFe>{qr}</qrCodMDFe></infMDFeSupl>
+</MDFe>
 <protMDFe versao="3.00"><infProt><tpAmb>1</tpAmb><verAplic>PR-v3_0_2</verAplic>
 <chMDFe>{ch}</chMDFe><dhRecbto>2026-09-14T08:41:03-03:00</dhRecbto>
 <nProt>141260399887766</nProt><digVal>def456</digVal><cStat>100</cStat>

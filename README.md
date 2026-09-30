@@ -112,6 +112,12 @@ pode prometer:
   exige, e IBS/CBS no mesmo formato do DANFE. O canhoto, opcional no manual,
   não é impresso: serve a quem entrega a carga, não a quem recebe o CT-e.
 
+  No DAMDFE, a única medida que o manual fixa é a do QR Code: no mínimo
+  25 × 25 mm (MOC MDF-e 3.00b, Anexo II, 2.3 e 2.6.2), e os oito modelos
+  oficiais o põem no canto superior direito. É onde ele sai, em toda folha,
+  com o conteúdo de `qrCodMDFe` — inclusive em contingência, quando a URL
+  carrega a assinatura da chave.
+
 - **Eventos**: não existe representação gráfica obrigatória em MOC nenhum. O
   desenho é próprio. A Carta de Correção tem texto legal de redação fixa
   (`xCondUso`), mas isso é obrigação do *arquivo*, não de um impresso.
@@ -312,7 +318,7 @@ terceiros e não é nosso para publicar.
 
 Numa cópia sem essa pasta a suíte **passa**: os 62 testes que exigem documento
 real se declaram *ignorados*, com o motivo, em vez de falhar — falha quer dizer
-defeito, e não há defeito nenhum em não ter o corpus. Os outros 252 rodam
+defeito, e não há defeito nenhum em não ter o corpus. Os outros 268 rodam
 normalmente, e as PNGs de conferência visual continuam sendo geradas a partir
 das amostras sintéticas.
 

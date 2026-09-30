@@ -31,7 +31,9 @@
 <lacres><nLacre>LAC0099123</nLacre></lacres>
 <lacres><nLacre>LAC0099124</nLacre></lacres>
 <infAdic><infCpl>TEXTO DE AMOSTRA</infCpl></infAdic>
-</infMDFe></MDFe>
+</infMDFe>
+<infMDFeSupl><qrCodMDFe>https://dfe-portal.svrs.rs.gov.br/mdfe/qrCode?chMDFe=41260911222333000181580010000055122334400777&amp;tpAmb=1&amp;sign=HuEQSpIUPlRE0XCcJsbX9eQpMbJAj4zShSs2lhmNUhxUQ/flw0vfgoZOPc2nJxaB37AikwpaEuku7uGkxTwKBwsG7brk4y02nW4X8Z+CZ8E/OU8bFA8QHt9fkmLz/g6ejy4K4wMZ6pIqZ0NZMBy/OFY8FHOVksby8c9i7eBRt+D54il5rwedk0Du447FghfTKkSbW5rHAsGy2RB/xJCApZdzbOR3PsPhPDsBBoQBXjT20kLNIvh+2wtl0srLzsqENVtDjFqK5x5KIw5iaOxqgLundW3ArokOSeS+RMY71QUn+NUA66/3inPUCqBF5Cj7nRNv9Ju06QE6TN7vfLN5Aw==</qrCodMDFe></infMDFeSupl>
+</MDFe>
 <protMDFe versao="3.00"><infProt><tpAmb>1</tpAmb><verAplic>PR-v3_0_2</verAplic>
 <chMDFe>41260911222333000181580010000055122334400777</chMDFe><dhRecbto>2026-09-14T08:41:03-03:00</dhRecbto>
 <nProt>999999999999990</nProt><digVal>def456</digVal><cStat>100</cStat>

@@ -31,7 +31,9 @@
 <lacres><nLacre>LAC0099123</nLacre></lacres>
 <lacres><nLacre>LAC0099124</nLacre></lacres>
 <infAdic><infCpl>TEXTO DE AMOSTRA</infCpl></infAdic>
-</infMDFe></MDFe>
+</infMDFe>
+<infMDFeSupl><qrCodMDFe>https://dfe-portal.svrs.rs.gov.br/mdfe/qrCode?chMDFe=41260912ABC34501DE35580010000055121334400770&amp;tpAmb=1</qrCodMDFe></infMDFeSupl>
+</MDFe>
 <protMDFe versao="3.00"><infProt><tpAmb>1</tpAmb><verAplic>PR-v3_0_2</verAplic>
 <chMDFe>41260912ABC34501DE35580010000055121334400770</chMDFe><dhRecbto>2026-09-14T08:41:03-03:00</dhRecbto>
 <nProt>999999999999990</nProt><digVal>def456</digVal><cStat>100</cStat>

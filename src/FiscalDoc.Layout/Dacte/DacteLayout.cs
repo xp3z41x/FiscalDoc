@@ -1,8 +1,6 @@
-using System.Text;
 using FiscalDoc.Core.Model.Cte;
 using FiscalDoc.Core.Model.Nfe;
 using FiscalDoc.Core.Values;
-using FiscalDoc.Layout.Barcode;
 using FiscalDoc.Layout.Composition;
 using FiscalDoc.Layout.DisplayList;
 
@@ -78,25 +76,9 @@ public static class DacteLayout
         ExigeSemValorFiscal: cte.ExigeSemValorFiscal,
         DizerContingencia: RotulosCte.DizerContingencia(cte.TipoEmissao)?.ToUpperInvariant(),
         TextoConsulta: "www.cte.fazenda.gov.br/portal",
-        QrCode: CodificarQr(cte.QrCode));
 
-    /// <summary>
-    /// QR Code do DACTE: manual, 2.19.1, "campo 3: informara o QR Code". O
-    /// conteudo vem inteiro do arquivo, e um texto maior do que o maior simbolo
-    /// comporta faria <see cref="QrCode.Codificar"/> recusar. Diferente do
-    /// cupom da NFC-e, aqui o QR e um campo entre dezenas: perde-se o simbolo,
-    /// e nao o documento inteiro.
-    /// </summary>
-    private static MatrizQr? CodificarQr(string? conteudo)
-    {
-        if (string.IsNullOrWhiteSpace(conteudo)
-            || Encoding.UTF8.GetByteCount(conteudo) > QrCode.CapacidadeDadosBytes(40))
-        {
-            return null;
-        }
-
-        return QrCode.Codificar(conteudo);
-    }
+        // Manual, 2.19.1: "campo 3: informara o QR Code".
+        QrCode: CabecalhoFiscal.CodificarQr(cte.QrCode));
 
     private static List<BlocoDoc> MontarBlocos(CteDocumento cte)
     {

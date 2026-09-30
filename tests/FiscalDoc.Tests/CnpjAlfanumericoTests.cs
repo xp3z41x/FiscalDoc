@@ -324,19 +324,23 @@ public sealed class CnpjAlfanumericoTests
     /// os que a versao anterior a esta mudanca desenhava para as mesmas
     /// amostras - e as PNGs de conferencia de toda amostra numerica sairam
     /// identicas, byte a byte.
+    ///
+    /// <para>O DAMDFE entra com e sem QR Code: sao as duas divisoes de coluna
+    /// do cabecalho, e um MDF-e anterior ao infMDFeSupl chega sem ele.</para>
     /// </summary>
     [Theory]
-    [InlineData("cte-400-subcontratacao.xml", 104f, 62f)]      // retrato, com QR Code
-    [InlineData("cte-400-rodoviario.xml", 163.9f, 89.1f)]      // paisagem, com QR Code
-    [InlineData("mdfe-300-rodoviario.xml", 130.26f, 72.24f)]   // DAMDFE, sem QR Code
-    public void Chave_numerica_nao_muda_a_geometria_do_cabecalho(string arquivo, float x, float largura)
+    [InlineData("cte-400-subcontratacao.xml", false, 104f, 62f)]      // retrato, com QR Code
+    [InlineData("cte-400-rodoviario.xml", false, 163.9f, 89.1f)]      // paisagem, com QR Code
+    [InlineData("mdfe-300-rodoviario.xml", false, 103.8f, 61.2f)]     // DAMDFE, com QR Code
+    [InlineData("mdfe-300-rodoviario.xml", true, 130.26f, 72.24f)]    // DAMDFE, sem QR Code
+    public void Chave_numerica_nao_muda_a_geometria_do_cabecalho(string arquivo, bool semQr, float x, float largura)
     {
         var ok = Assert.IsType<ResultadoLeitura.Ok>(LeitorDocumento.Ler(Amostras.Sintetica(arquivo)));
 
         ConjuntoPaginas c = ok.Documento switch
         {
             CteDocumento cte => DacteLayout.Construir(cte, Medidor),
-            MdfeDocumento mdfe => DamdfeLayout.Construir(mdfe, Medidor),
+            MdfeDocumento mdfe => DamdfeLayout.Construir(semQr ? mdfe with { QrCode = null } : mdfe, Medidor),
             _ => throw new InvalidOperationException(arquivo),
         };
 
