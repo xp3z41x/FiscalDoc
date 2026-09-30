@@ -116,17 +116,11 @@ public static class DanfeNfce
     private const float AlturaMaximaMm = 297f;
 
     /// <summary>
-    /// Lado do quadrado do QR Code, margem clara inclusa.
-    ///
-    /// <para>O manual exige no minimo 25 x 25 mm, "sendo 22mm de conteudo para
-    /// 3mm de margem segura". A caixa e maior que o minimo por causa da
-    /// quantizacao: o renderizador arredonda a largura do modulo <b>para
-    /// baixo</b>, em pontos inteiros do dispositivo, para nunca estourar a
-    /// caixa - e a 300 dpi isso custa ate um ponto por modulo. Com 34 mm, o
-    /// simbolo impresso fica em torno de 25 mm de conteudo mesmo depois da
-    /// perda, e continua acima dos 22 mm que o manual pede.</para>
+    /// Lado do quadrado do QR Code, margem clara inclusa. A conta que leva aos
+    /// 34 mm esta em <see cref="QrCode.LadoCaixaImpressaMm"/>: o manual do
+    /// DACTE pede o mesmo minimo, e a medida e uma so.
     /// </summary>
-    private const float LadoQrMm = 34f;
+    private const float LadoQrMm = QrCode.LadoCaixaImpressaMm;
 
     /// <summary>Respiro entre uma divisao e a linha divisoria seguinte.</summary>
     private const float RespiroMm = 1.1f;

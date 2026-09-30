@@ -18,7 +18,7 @@ proper accents (`INSCRIÇÃO`, not `INSCRICAO`); they are a fiscal document.
 
 ```bash
 dotnet build -c Release                       # 0 warnings required (TreatWarningsAsErrors)
-dotnet test tests/FiscalDoc.Tests -c Release  # 350 tests
+dotnet test tests/FiscalDoc.Tests -c Release  # 397 tests
 ```
 
 Single test class / single test:
@@ -239,6 +239,15 @@ These were each learned from a real bug. Changing them silently breaks output.
 - **`MOC §3.1`: never print anything that is not in the XML.** No computed
   totals, no synthesised protocol numbers. `IbsCbsTests.Nada_e_calculado_pelo_aplicativo`
   fails if someone adds a convenient sum.
+- **An access key is data, and reading it is not inventing.** The emitter,
+  série and número of an NF-e (or DC-e, or CT-e) that a CT-e cites come out
+  of the key itself — `ChaveAcesso.Serie`, `.Numero`, `.DocumentoEmitente` —
+  because the key's composition is normative. That is how the DACTE fills the
+  manual's TP DOC / CNPJ-CPF EMITENTE / SÉRIE-Nº columns, and printing only
+  the 44 digits is exactly what a user's finance department could not read.
+  The 14-digit issuer field holds a CPF zero-padded when the issuer is a
+  person; check digits decide, and a tie (Banco do Brasil's
+  00.000.000/0001-91 is one) goes to CNPJ.
 
 ## The normative asymmetry — essential domain context
 
@@ -264,7 +273,26 @@ Consequences baked into the code:
 - DACTE, DAMDFE and events go through `Composition/MontadorDocumento.cs`, a
   block-stacking engine with automatic pagination — deliberately not
   pixel-coordinates, because there is nothing to be faithful *to*. The agreed
-  bar is "a human reads the document correctly".
+  bar is "a human reads the document correctly". Two pagination rules live
+  there: a `Secao` title (or a `Linha` marked `MantemComProximo`) never ends a
+  page without the start of what it introduces, and a `Tabela` split across
+  pages reopens with its `TituloNaContinuacao` — the DACTE sets it on every
+  table from the last title before it, as the official model's second sheet
+  does with "DOCUMENTOS ORIGINÁRIOS".
+- **The DACTE's geometry is free, but its content is not.** MOC CT-e 4.00
+  Anexo II §3 ("Correlação dos campos do XML do CT-e x DACTE") maps every tag
+  to a quadro, and `DacteLayout` cites it block by block: documentos
+  originários, QR Code in the header of every sheet (§2.19.1; box size shared
+  with the NFC-e in `QrCode.LadoCaixaImpressaMm`), the tomador quadro always
+  (`CteDocumento.TomadorEfetivo`, from toma4 or the participant toma3 names),
+  ICMS60's own tags (`vBCSTRet`, `pICMSSTRet`, `vICMSSTRet` — without them
+  base, rate and value printed blank), documentos anteriores, CT-e
+  complementado/substituído/anulado/multimodal, veículos novos and artigos
+  perigosos (§2.21.4), and one "Informações específicas" quadro per modal.
+  House conventions, requested by the user and drawn only when the file has
+  them: cobrança, previsão de entrega, características adicionais, ordens de
+  coleta; IBS/CBS copies the DANFE's block. No canhoto — optional in §2.21.5,
+  and it serves whoever delivers the cargo, not whoever receives the CT-e.
 - **DANFE retrato and paisagem are two separate layouts**, not one rotated. In
   paisagem the canhoto becomes a vertical strip on the left edge, block titles
   become 5,1 mm vertical tabs, and row height drops from 8,5 to 6,4 mm.
@@ -307,11 +335,19 @@ Consequences baked into the code:
   protocol and product description for fictitious values and **recomputes the
   check digits** of CNPJ, CPF and the access key. The call sits inside each
   generator's `escrever`, never per-sample, so a new sample cannot skip it.
+  The swap is **one regex pass**, longest match first: sequential
+  `str.replace` chained whenever a fictitious value equalled another number's
+  original, which corrupted the events' keys (cUF+AAMM overwritten by a CNPJ)
+  and merged a toma4 tomador's CNPJ into the emitente's.
   Output is deterministic: generating twice yields identical bytes. Three
   tests pin values it produces (`TransporteTests`, `VariacoesTests`); change a
   name pool and they need updating.
 - CT-e / MDF-e / event samples are **synthetic**, built from the official schema
   structure. Structurally faithful, but not a substitute for real documents.
+  The CT-e set covers all six modals, complemento, substituto and a portrait
+  subcontratação that carries nearly every optional group; `infCTeSupl` is a
+  sibling of `infCte` there, as the schema has it (the first generator put it
+  inside, and the parser still accepts that).
 - `tests/Saida/` — the suite renders every document to PNG here (via
   `GeradorVisual`) for visual inspection. Gitignored. Look at these after
   changing any layout; assertions do not catch a crooked quadro.

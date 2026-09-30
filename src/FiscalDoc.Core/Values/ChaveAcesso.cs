@@ -27,6 +27,34 @@ public sealed record ChaveAcesso
     public string DigitoVerificador => Digitos.Substring(43, 1);
 
     /// <summary>
+    /// CNPJ ou CPF do emitente, com o tamanho certo para ser formatado.
+    ///
+    /// <para>O campo da chave tem 14 posicoes e, quando o emitente e pessoa
+    /// fisica - produtor rural na NF-e, transportador autonomo no CT-e -, traz
+    /// o CPF completado com zeros a esquerda. Os digitos verificadores
+    /// desempatam: vale CNPJ se o CNPJ confere, e CPF se so o CPF confere.
+    /// Quando os dois conferem ao mesmo tempo, o que acontece em cerca de 1 %
+    /// das chaves que comecam por 000, fica o CNPJ - pessoa juridica e de
+    /// longe o emitente mais comum, e o Banco do Brasil, 00.000.000/0001-91,
+    /// e um exemplo real do empate.</para>
+    /// </summary>
+    public string DocumentoEmitente
+    {
+        get
+        {
+            string campo = CnpjEmitente;
+
+            if (!CnpjConfere(campo) && campo.StartsWith("000", StringComparison.Ordinal)
+                && CpfConfere(campo[3..]))
+            {
+                return campo[3..];
+            }
+
+            return campo;
+        }
+    }
+
+    /// <summary>
     /// O DV informado confere com o modulo 11 calculado sobre os 43 primeiros.
     /// O app nao recusa chave com DV errado - so imprime o que esta no arquivo,
     /// conforme o MOC. Mas calcular e barato e a informacao fica disponivel.
@@ -81,6 +109,50 @@ public sealed record ChaveAcesso
         }
 
         return n == 44 ? new ChaveAcesso(new string(so)) : null;
+    }
+
+    private static bool CnpjConfere(string d)
+    {
+        if (d.Length != 14)
+        {
+            return false;
+        }
+
+        int[] pesos1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+        int[] pesos2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+
+        return DvCadastro(d, pesos1) == d[12] - '0'
+            && DvCadastro(d, pesos2) == d[13] - '0';
+    }
+
+    private static bool CpfConfere(string d)
+    {
+        if (d.Length != 11)
+        {
+            return false;
+        }
+
+        int[] pesos1 = [10, 9, 8, 7, 6, 5, 4, 3, 2];
+        int[] pesos2 = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2];
+
+        return DvCadastro(d, pesos1) == d[9] - '0'
+            && DvCadastro(d, pesos2) == d[10] - '0';
+    }
+
+    /// <summary>
+    /// Modulo 11 do CNPJ e do CPF sobre os primeiros <c>pesos.Length</c>
+    /// digitos: resto menor que 2 vira zero.
+    /// </summary>
+    private static int DvCadastro(string d, int[] pesos)
+    {
+        int soma = 0;
+        for (int i = 0; i < pesos.Length; i++)
+        {
+            soma += (d[i] - '0') * pesos[i];
+        }
+
+        int resto = soma % 11;
+        return resto < 2 ? 0 : 11 - resto;
     }
 
     /// <summary>Modulo 11 do MOC: pesos 2..9 ciclicos, da direita para a esquerda.</summary>

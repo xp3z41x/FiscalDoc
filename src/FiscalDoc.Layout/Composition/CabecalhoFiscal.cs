@@ -20,7 +20,8 @@ public sealed record DadosCabecalho(
     Protocolo? Protocolo,
     bool ExigeSemValorFiscal,
     string? DizerContingencia,
-    string? TextoConsulta);
+    string? TextoConsulta,
+    MatrizQr? QrCode = null);
 
 /// <summary>
 /// Cabecalho comum aos documentos que passam pelo <see cref="MontadorDocumento"/>.
@@ -28,6 +29,11 @@ public sealed record DadosCabecalho(
 /// Reune emitente, identificacao do documento, codigo de barras da chave e
 /// area do protocolo - que e o mesmo conjunto que o MOC do CT-e (2.12) e o do
 /// MDF-e mandam repetir em toda folha adicional.
+///
+/// <para>Com QR Code, o simbolo ganha uma coluna propria a direita, da altura
+/// do topo e da faixa de identificacao juntos - a posicao do modelo oficial do
+/// DACTE, que o repete em toda folha. Sem QR Code a geometria e a de sempre,
+/// milimetro por milimetro.</para>
 /// </summary>
 public static class CabecalhoFiscal
 {
@@ -54,26 +60,47 @@ public static class CabecalhoFiscal
     {
         float y = m.Topo;
 
-        float larguraEmit = m.Largura * 0.42f;
-        float larguraId = m.Largura * 0.20f;
-        float larguraChave = m.Largura - larguraEmit - larguraId;
-
         // 30 mm: 14 para o codigo de barras, 7,5 para a chave e 8,5 para a
         // area do protocolo - que precisa comportar o rotulo mais uma linha de
         // valor sem cortar. Com 26 mm sobravam 4,5 mm e o numero saia partido.
         const float alturaTopo = 30.0f;
+        const float alturaFaixa = 7.5f;
+
+        // O QR Code ocupa um quadrado da altura do cabecalho inteiro, e o resto
+        // se reparte na largura que sobra.
+        float larguraQr = d.QrCode is null ? 0f : alturaTopo + alturaFaixa;
+        float largura = m.Largura - larguraQr;
+
+        (float larguraEmit, float larguraId) = d.QrCode is null
+            ? (largura * 0.42f, largura * 0.20f)
+            : DividirComQr(largura);
+
+        float larguraChave = largura - larguraEmit - larguraId;
 
         // ---- Emitente ----
         var emit = new RetanguloMm(m.Esquerda, y, larguraEmit, alturaTopo);
         c.Moldura(emit);
 
         RetanguloMm dentro = emit.Encolhido(1.8f);
-        c.Texto(dentro.FatiaSuperior(5.5f), d.RazaoSocialEmitente, e.EmitenteNome, AlinhamentoH.Centro);
+
+        // A razao social quebra linha em vez de perder o fim: com o QR Code a
+        // coluna do emitente estreita, e no retrato um nome que cabia inteiro
+        // passaria a sair cortado. Numa linha so, a posicao e a de sempre.
+        int linhasNome = LinhasDoNome(m.Medidor, e, d.RazaoSocialEmitente, dentro.Largura);
+        float alturaNome = 5.5f + ((linhasNome - 1) * m.Medidor.AlturaLinhaMm(e.EmitenteNome));
+
+        c.Texto(
+            dentro.FatiaSuperior(alturaNome),
+            d.RazaoSocialEmitente,
+            e.EmitenteNome,
+            AlinhamentoH.Centro,
+            AlinhamentoV.Topo,
+            quebrar: linhasNome > 1);
 
         if (d.EnderecoEmitente is { } en)
         {
             c.Texto(
-                dentro.SemFatiaSuperior(6f),
+                dentro.SemFatiaSuperior(alturaNome + 0.5f),
                 $"{en.LinhaLogradouro}\n{en.Bairro} - CEP: {Formatos.Cep(en.Cep)}\n"
                 + $"{en.Municipio} - {en.Uf}"
                 + (string.IsNullOrWhiteSpace(en.Fone)
@@ -95,11 +122,19 @@ public static class CabecalhoFiscal
         c.Texto(new RetanguloMm(di.X, yi, di.Largura, 5f), d.Sigla, e.PalavraDanfe, AlinhamentoH.Centro);
         yi += 5.2f;
 
+        // Duas linhas cabem nos 6 mm de sempre. Numa coluna estreita - o
+        // retrato com QR Code - a descricao do DACTE pede tres, e com a altura
+        // fixa a terceira passava por baixo do numero do documento. A caixa
+        // cresce pelo que o texto mede; ha folga para isso ate o fim da coluna.
+        int linhasDescricao = m.Medidor.Quebrar(d.Descricao, e.DescricaoDanfe, di.Largura).Count;
+        float alturaDescricao = Math.Max(
+            6f, (linhasDescricao * m.Medidor.AlturaLinhaMm(e.DescricaoDanfe)) + 0.4f);
+
         c.Texto(
-            new RetanguloMm(di.X, yi, di.Largura, 6f),
+            new RetanguloMm(di.X, yi, di.Largura, alturaDescricao),
             d.Descricao, e.DescricaoDanfe,
             AlinhamentoH.Centro, AlinhamentoV.Topo, quebrar: true);
-        yi += 6.4f;
+        yi += alturaDescricao + 0.4f;
 
         c.Texto(
             new RetanguloMm(di.X, yi, di.Largura, 3.6f),
@@ -153,20 +188,73 @@ public static class CabecalhoFiscal
         c.Moldura(caixaProt);
         DesenharProtocolo(c, e, d, caixaProt);
 
+        // ---- QR Code ----
+        if (d.QrCode is { } qr)
+        {
+            var coluna = new RetanguloMm(m.Direita - larguraQr, y, larguraQr, alturaTopo + alturaFaixa);
+            c.Moldura(coluna);
+
+            float lado = Math.Min(QrCode.LadoCaixaImpressaMm, Math.Min(coluna.Largura, coluna.Altura) - 1f);
+            c.Qr(
+                new RetanguloMm(
+                    coluna.X + ((coluna.Largura - lado) / 2f),
+                    coluna.Y + ((coluna.Altura - lado) / 2f),
+                    lado,
+                    lado),
+                qr);
+        }
+
         y += alturaTopo;
 
         // ---- Faixa de identificacao ----
-        var faixa = new RetanguloMm(m.Esquerda, y, m.Largura, 7.5f);
+        var faixa = new RetanguloMm(m.Esquerda, y, largura, alturaFaixa);
 
-        RetanguloMm[] cols = Campo.Colunas(
-            faixa, m.Largura * 0.34f, m.Largura * 0.26f, m.Largura * 0.18f, 0f);
+        // Com QR Code a faixa perde 37,5 mm, e as proporcoes de sempre cortavam
+        // "MODAL / TIPO" e o endereco de consulta no retrato. Aqui cada coluna
+        // recebe pelo que o conteudo pede.
+        RetanguloMm[] cols = d.QrCode is null
+            ? Campo.Colunas(faixa, largura * 0.34f, largura * 0.26f, largura * 0.18f, 0f)
+            : Campo.Colunas(faixa, largura * 0.20f, largura * 0.16f, largura * 0.34f, 0f);
 
         c.Rotulado(cols[0], "CNPJ / CPF DO EMITENTE", Formatos.CnpjOuCpf(d.DocumentoEmitente));
         c.Rotulado(cols[1], "INSCRIÇÃO ESTADUAL", d.InscricaoEstadual);
         c.Rotulado(cols[2], d.Sigla == "DAMDFE" ? "MODAL" : "MODAL / TIPO", d.ModalOuTipo);
         c.Rotulado(cols[3], "CONSULTA", d.TextoConsulta ?? "www.cte.fazenda.gov.br");
 
-        return y + 7.5f;
+        return y + alturaFaixa;
+    }
+
+    /// <summary>
+    /// Divisao da largura quando o QR Code toma a sua coluna. A proporcao de
+    /// sempre espremeria o codigo de barras abaixo do modulo minimo no
+    /// retrato; por isso a coluna da chave recebe primeiro o que o codigo
+    /// precisa - entre o modulo minimo e o maximo, mais o respiro de 3 mm -,
+    /// e o emitente fica com o resto.
+    /// </summary>
+    private static (float Emitente, float Identificacao) DividirComQr(float largura)
+    {
+        float minima = (ModuloMinimo * Code128C.TotalModulos(44)) + 3f;
+        float maxima = (ModuloMaximo * Code128C.TotalModulos(44)) + 3f;
+
+        float chave = Math.Clamp(largura * 0.40f, minima, maxima);
+        float id = Math.Clamp(largura * 0.20f, 30f, 55f);
+
+        return (largura - chave - id, id);
+    }
+
+    /// <summary>
+    /// Quantas linhas a razao social ocupa, ate tres: o xNome tem no maximo 60
+    /// caracteres, e tres linhas e o que a caixa comporta junto com as quatro
+    /// do endereco.
+    /// </summary>
+    private static int LinhasDoNome(IMedidorTexto medidor, EstilosDanfe e, string? nome, float largura)
+    {
+        if (string.IsNullOrWhiteSpace(nome))
+        {
+            return 1;
+        }
+
+        return Math.Clamp(medidor.Quebrar(nome, e.EmitenteNome, largura).Count, 1, 3);
     }
 
     /// <summary>

@@ -205,15 +205,18 @@ def anonimizar(xml: str) -> str:
 
     mapa_chave = {c: nova_chave(c) for c in dict.fromkeys(re.findall(r"\d{44}", xml))}
 
-    # Ordem importa: a chave CONTEM o CNPJ, entao a chave e trocada primeiro.
-    for antiga, nova in mapa_chave.items():
-        xml = xml.replace(antiga, nova)
-
-    for antigo, novo in mapa_cnpj.items():
-        xml = xml.replace(antigo, novo)
-
-    for antigo, novo in mapa_cpf.items():
-        xml = xml.replace(antigo, novo)
+    # Uma passada so, e nao um replace por mapa. Em cadeia, o valor novo de um
+    # numero podia ser o valor ANTIGO de outro, e o replace seguinte o trocava
+    # de novo: num CT-e com tomador "outros", que vem em ide - antes do
+    # emitente -, o CNPJ do tomador virava 11222333000181, que era o CNPJ de
+    # origem do emitente, e os dois saiam iguais. A alternancia tenta o mais
+    # longo primeiro, e isso preserva a regra antiga: a chave CONTEM o CNPJ, e
+    # tem de ser trocada inteira antes que o CNPJ de dentro dela seja visto.
+    trocas = {**mapa_cpf, **mapa_cnpj, **mapa_chave}
+    if trocas:
+        padrao = re.compile(
+            "|".join(re.escape(t) for t in sorted(trocas, key=len, reverse=True)))
+        xml = padrao.sub(lambda m: trocas[m.group(0)], xml)
 
     # cDV e o mesmo digito do fim da chave; tem de acompanhar.
     if mapa_chave:

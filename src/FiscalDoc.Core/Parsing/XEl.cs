@@ -177,6 +177,16 @@ internal static class XEl
             : null;
     }
 
+    /// <summary>Hora pura (campos h*, formato HH:MM:SS, ex.: hProg da previsao de entrega).</summary>
+    internal static TimeOnly? Hora(this XElement? pai, string localName)
+    {
+        string? v = pai.Str(localName);
+        return v is not null
+            && TimeOnly.TryParse(v, CultureInfo.InvariantCulture, DateTimeStyles.None, out TimeOnly t)
+            ? t
+            : null;
+    }
+
     /// <summary>Valor de atributo por local-name.</summary>
     internal static string? Attr(this XElement? e, string localName)
     {

@@ -102,6 +102,16 @@ pode prometer:
   aqui. O que se garante é: todos os blocos do modelo oficial, na ordem do
   modelo oficial, legíveis.
 
+  No DACTE, porém, o **conteúdo** é normativo: a seção 3 do Anexo II do MOC
+  CT-e 4.00 diz qual tag vai em qual quadro, e o layout a segue. Os documentos
+  originários saem como o manual pede — tipo, CNPJ/CPF do emitente e
+  série/número da nota —, com a chave de acesso ao lado; o QR Code fica no
+  cabeçalho de toda folha; o quadro do tomador sai sempre. Quando o arquivo os
+  traz, o DACTE mostra também cobrança (fatura e duplicatas), previsão de
+  entrega, características adicionais e ordens de coleta, que o manual não
+  exige, e IBS/CBS no mesmo formato do DANFE. O canhoto, opcional no manual,
+  não é impresso: serve a quem entrega a carga, não a quem recebe o CT-e.
+
 - **Eventos**: não existe representação gráfica obrigatória em MOC nenhum. O
   desenho é próprio. A Carta de Correção tem texto legal de redação fixa
   (`xCondUso`), mas isso é obrigação do *arquivo*, não de um impresso.
@@ -241,7 +251,8 @@ A suíte tem duas origens de amostra, e só uma delas está no repositório.
 **`tests/Amostras/` — versionadas e anonimizadas.** Cobrem o que documento
 comum não tem: contingência (SVC-AN, FS-DA e offline da NFC-e), homologação,
 ausência de protocolo, ISSQN, destinatário pessoa física, arquivo em Latin-1,
-Imposto Seletivo, cupom de 120 itens, NFC-e sem `infNFeSupl`, CT-e, MDF-e e
+Imposto Seletivo, cupom de 120 itens, NFC-e sem `infNFeSupl`, CT-e dos seis
+modais — de complemento, substituto e de subcontratação inclusive —, MDF-e e
 eventos.
 
 As de CT-e, MDF-e e evento são montadas do zero a partir da estrutura dos

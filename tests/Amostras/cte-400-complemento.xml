@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cteProc versao="4.00" xmlns="http://www.portalfiscal.inf.br/cte">
+<CTe xmlns="http://www.portalfiscal.inf.br/cte"><infCte versao="4.00" Id="CTe41260911222333000181570010000918011741147219">
+<ide><cUF>41</cUF><cCT>74114721</cCT><CFOP>6352</CFOP>
+<natOp>PRESTACAO DE SERVICO DE TRANSPORTE</natOp>
+<mod>57</mod><serie>1</serie><nCT>91801</nCT>
+<dhEmi>2026-09-14T09:18:37-03:00</dhEmi><tpImp>2</tpImp><tpEmis>1</tpEmis>
+<cDV>9</cDV><tpAmb>1</tpAmb><tpCTe>1</tpCTe><procEmi>0</procEmi>
+<verProc>4.0.7</verProc>
+<cMunEnv>4106902</cMunEnv><xMunEnv>CURITIBA</xMunEnv><UFEnv>PR</UFEnv>
+<modal>01</modal><tpServ>0</tpServ>
+<cMunIni>4106902</cMunIni><xMunIni>CURITIBA</xMunIni><UFIni>PR</UFIni>
+<cMunFim>3550308</cMunFim><xMunFim>SAO PAULO</xMunFim><UFFim>SP</UFFim>
+<retira>1</retira><indIEToma>1</indIEToma>
+<toma3><toma>3</toma></toma3></ide>
+
+<emit><CNPJ>11222333000181</CNPJ><IE>9999999990</IE>
+<xNome>INDUSTRIA E COMERCIO ZENITE SA</xNome><xFant>ANA PAULA MARTINS</xFant>
+<enderEmit><xLgr>TRAVESSA DO MIRANTE</xLgr><nro>2986</nro><xBairro>CENTRO</xBairro>
+<cMun>4106902</cMun><xMun>CURITIBA</xMun><CEP>99999990</CEP><UF>PR</UF>
+<fone>9999999990</fone></enderEmit><CRT>3</CRT></emit>
+<rem><CNPJ>12222333000144</CNPJ><IE>9999999990</IE>
+<xNome>ATACADISTA PONTO CARDEAL LTDA ME</xNome><fone>9999999990</fone>
+<enderReme><xLgr>ALAMEDA DAS PALMEIRAS</xLgr><nro>193</nro><xBairro>CENTRO</xBairro>
+<cMun>4302105</cMun><xMun>BENTO GONCALVES</xMun><CEP>99999990</CEP><UF>RS</UF>
+<cPais>1058</cPais><xPais>BRASIL</xPais></enderReme></rem><dest><CNPJ>13222333000107</CNPJ><IE>999999990</IE>
+<xNome>DISTRIBUIDORA VERTICE LTDA</xNome><fone>9999999990</fone>
+<enderDest><xLgr>TRAVESSA DO MIRANTE</xLgr><nro>SN</nro><xCpl>COMPLEMENTO</xCpl>
+<xBairro>JARDIM NOVO</xBairro><cMun>3550308</cMun><xMun>SAO PAULO</xMun>
+<CEP>99999990</CEP><UF>SP</UF><cPais>1058</cPais><xPais>BRASIL</xPais></enderDest></dest>
+<vPrest><vTPrest>180.00</vTPrest><vRec>180.00</vRec>
+<Comp><xNome>DIFERENCA DE FRETE</xNome><vComp>180.00</vComp></Comp></vPrest>
+<imp><ICMS><ICMS00><CST>00</CST><vBC>180.00</vBC><pICMS>12.00</pICMS><vICMS>21.60</vICMS></ICMS00></ICMS><vTotTrib>34.20</vTotTrib></imp>
+<infCteComp><chCTe>41260911222333000181570010000917231741146435</chCTe></infCteComp>
+<infCteComp><chCTe>41260911222333000181570010000917241741146440</chCTe></infCteComp>
+</infCte>
+<infCTeSupl><qrCodCTe>https://dfe-portal.svrs.rs.gov.br/cte/qrCode?chCTe=41260911222333000181570010000918011741147219&amp;tpAmb=1</qrCodCTe></infCTeSupl>
+</CTe>
+<protCTe versao="4.00"><infProt><tpAmb>1</tpAmb><verAplic>PR-v4_0_7</verAplic>
+<chCTe>41260911222333000181570010000918011741147219</chCTe><dhRecbto>2026-09-14T09:19:02-03:00</dhRecbto>
+<nProt>999999999999990</nProt><digVal>abc123</digVal><cStat>100</cStat>
+<xMotivo>TEXTO DE AMOSTRA</xMotivo></infProt></protCTe>
+</cteProc>

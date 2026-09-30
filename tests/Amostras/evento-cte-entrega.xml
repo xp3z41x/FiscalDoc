@@ -2,7 +2,7 @@
 <procEventoCTe versao="4.00" xmlns="http://www.portalfiscal.inf.br/cte">
 <eventoCTe versao="4.00"><infEvento Id="ID1101601222233300014400018157001000091723174513920001">
 <cOrgao>41</cOrgao><tpAmb>1</tpAmb><CNPJ>11222333000181</CNPJ>
-<chCTe>12222333000144000181570010000917231741139200</chCTe><dhEvento>2026-09-16T11:48:00-03:00</dhEvento>
+<chCTe>41260911222333000181570010000917231741139200</chCTe><dhEvento>2026-09-16T11:48:00-03:00</dhEvento>
 <tpEvento>110160</tpEvento><nSeqEvento>1</nSeqEvento>
 <detEvento versaoEvento="4.00"><evCECTe><descEvento>Comprovante de Entrega do CT-e</descEvento>
 <dhEntrega>2026-09-16T11:40:00-03:00</dhEntrega>
@@ -13,7 +13,7 @@
 <retEventoCTe versao="4.00"><infEvento Id="ID110160122223330001440001815700100009172317451392000101">
 <tpAmb>1</tpAmb><verAplic>PR-v4_0_7</verAplic><cOrgao>41</cOrgao>
 <cStat>134</cStat><xMotivo>TEXTO DE AMOSTRA</xMotivo>
-<chCTe>12222333000144000181570010000917231741139200</chCTe><tpEvento>110160</tpEvento><nSeqEvento>1</nSeqEvento>
+<chCTe>41260911222333000181570010000917231741139200</chCTe><tpEvento>110160</tpEvento><nSeqEvento>1</nSeqEvento>
 <dhRegEvento>2026-09-16T11:48:31-03:00</dhRegEvento>
 <nProt>999999999999990</nProt></infEvento></retEventoCTe>
 </procEventoCTe>

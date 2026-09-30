@@ -39,8 +39,9 @@
 <infDoc><infNFe><chave>41260912222333000144550010002940001100000009</chave></infNFe><infNFe><chave>41260912222333000144550010002940011100000014</chave></infNFe><infNFe><chave>41260912222333000144550010002940021100000020</chave></infNFe></infDoc>
 <infModal versaoModal="4.00"><rodo><RNTRC>12345678</RNTRC></rodo></infModal>
 </infCTeNorm>
+</infCte>
 <infCTeSupl><qrCodCTe>https://dfe-portal.svrs.rs.gov.br/cte/qrCode?chCTe=41260911222333000181570010000917235741139202&amp;tpAmb=1</qrCodCTe></infCTeSupl>
-</infCte></CTe>
+</CTe>
 <protCTe versao="4.00"><infProt><tpAmb>1</tpAmb><verAplic>PR-v4_0_7</verAplic>
 <chCTe>41260911222333000181570010000917235741139202</chCTe><dhRecbto>2026-09-14T09:19:02-03:00</dhRecbto>
 <nProt>999999999999990</nProt><digVal>abc123</digVal><cStat>100</cStat>

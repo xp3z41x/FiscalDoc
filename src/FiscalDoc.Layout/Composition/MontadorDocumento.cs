@@ -26,19 +26,28 @@ public abstract record BlocoDoc
     /// <summary>Faixa de titulo de secao.</summary>
     public sealed record Secao(string Titulo) : BlocoDoc;
 
-    /// <summary>Uma linha de campos lado a lado.</summary>
-    public sealed record Linha(IReadOnlyList<CampoDoc> Campos) : BlocoDoc;
+    /// <summary>
+    /// Uma linha de campos lado a lado. <paramref name="MantemComProximo"/>
+    /// a impede de ficar sozinha no pe da pagina, separada do que ela
+    /// introduz - o emitente de um documento anterior e a tabela dos
+    /// documentos dele, por exemplo.
+    /// </summary>
+    public sealed record Linha(IReadOnlyList<CampoDoc> Campos, bool MantemComProximo = false) : BlocoDoc;
 
     /// <summary>Texto corrido com rotulo, que cresce conforme o conteudo.</summary>
     public sealed record Texto(string Rotulo, string? Conteudo, float AlturaMinimaMm = 10f) : BlocoDoc;
 
     /// <summary>
     /// Tabela. E o unico bloco que se divide entre paginas; quando isso
-    /// acontece, o cabecalho das colunas se repete na continuacao.
+    /// acontece, o cabecalho das colunas se repete na continuacao - e, se
+    /// houver <paramref name="TituloNaContinuacao"/>, o titulo do quadro
+    /// tambem, como na folha adicional do modelo oficial do DACTE, que reabre
+    /// com "DOCUMENTOS ORIGINARIOS".
     /// </summary>
     public sealed record Tabela(
         IReadOnlyList<ColunaDoc> Colunas,
-        IReadOnlyList<string[]> Linhas) : BlocoDoc;
+        IReadOnlyList<string[]> Linhas,
+        string? TituloNaContinuacao = null) : BlocoDoc;
 
     /// <summary>Espaco em branco deliberado.</summary>
     public sealed record Espaco(float AlturaMm) : BlocoDoc;
@@ -97,6 +106,12 @@ public sealed class MontadorDocumento
 
     public float Topo => _topo;
 
+    /// <summary>
+    /// O medidor do documento, para quem desenha o cabecalho. E o mesmo que
+    /// pagina o corpo - nao ha segunda metrica.
+    /// </summary>
+    public IMedidorTexto Medidor => _medidor;
+
     /// <summary>Altura de uma linha de campos: rotulo em cima, valor embaixo.</summary>
     public float AlturaLinha { get; init; } = 8.0f;
 
@@ -150,8 +165,10 @@ public sealed class MontadorDocumento
         var atual = new List<BlocoDoc>();
         float y = topoCorpo;
 
-        foreach (BlocoDoc b in blocos)
+        for (int indice = 0; indice < blocos.Count; indice++)
         {
+            BlocoDoc b = blocos[indice];
+
             if (b is BlocoDoc.Tabela t)
             {
                 // Tabela e o unico bloco divisivel. Consome o espaco que
@@ -191,6 +208,12 @@ public sealed class MontadorDocumento
                     plano.Add(atual);
                     atual = [];
                     y = topoCorpo;
+
+                    if (t.TituloNaContinuacao is { } titulo)
+                    {
+                        atual.Add(new BlocoDoc.Secao(titulo));
+                        y += AlturaSecao;
+                    }
                 }
 
                 continue;
@@ -198,7 +221,15 @@ public sealed class MontadorDocumento
 
             float altura = Medir(b);
 
-            if (y + altura > _base && atual.Count > 0)
+            // Titulo de secao nunca fica sozinho no pe da pagina: se ele nao
+            // cabe junto com o comeco do que introduz, vai junto para a
+            // proxima. Sem isto, o titulo ficava numa folha e o quadro na
+            // outra, sem nome.
+            float exigida = MantemComProximo(b) && indice + 1 < blocos.Count
+                ? altura + AlturaMinimaAPartirDe(blocos, indice + 1)
+                : altura;
+
+            if (y + exigida > _base && atual.Count > 0)
             {
                 plano.Add(atual);
                 atual = [];
@@ -211,6 +242,29 @@ public sealed class MontadorDocumento
 
         plano.Add(atual);
         return plano;
+    }
+
+    private static bool MantemComProximo(BlocoDoc b) =>
+        b is BlocoDoc.Secao or BlocoDoc.Linha { MantemComProximo: true };
+
+    /// <summary>
+    /// O minimo que precisa caber a partir do bloco <paramref name="i"/>: ele
+    /// inteiro - ou, se for tabela, o cabecalho e a primeira linha, porque o
+    /// resto pode seguir para a proxima pagina - mais o minimo do seguinte,
+    /// quando ele tambem nao pode ficar sozinho. E a cadeia titulo, linha de
+    /// emitente, tabela: um so salto de pagina para os tres.
+    /// </summary>
+    private float AlturaMinimaAPartirDe(IReadOnlyList<BlocoDoc> blocos, int i)
+    {
+        BlocoDoc b = blocos[i];
+
+        float propria = b is BlocoDoc.Tabela t
+            ? AlturaCabecalhoTabela + (Math.Min(1, t.Linhas.Count) * AlturaLinhaTabela)
+            : Medir(b);
+
+        return MantemComProximo(b) && i + 1 < blocos.Count
+            ? propria + AlturaMinimaAPartirDe(blocos, i + 1)
+            : propria;
     }
 
     private int LinhasQueCabem(float disponivelMm)

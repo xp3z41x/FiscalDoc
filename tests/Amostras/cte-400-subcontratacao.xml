@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cteProc versao="4.00" xmlns="http://www.portalfiscal.inf.br/cte">
+<CTe xmlns="http://www.portalfiscal.inf.br/cte"><infCte versao="4.00" Id="CTe41260912222333000144570010000917241741146449">
+<ide><cUF>41</cUF><cCT>74114644</cCT><CFOP>6352</CFOP>
+<natOp>PRESTACAO DE SERVICO DE TRANSPORTE</natOp>
+<mod>57</mod><serie>1</serie><nCT>91724</nCT>
+<dhEmi>2026-09-14T09:18:37-03:00</dhEmi><tpImp>1</tpImp><tpEmis>1</tpEmis>
+<cDV>9</cDV><tpAmb>1</tpAmb><tpCTe>0</tpCTe><procEmi>0</procEmi>
+<verProc>4.0.7</verProc>
+<cMunEnv>4106902</cMunEnv><xMunEnv>CURITIBA</xMunEnv><UFEnv>PR</UFEnv>
+<modal>01</modal><tpServ>1</tpServ>
+<cMunIni>4106902</cMunIni><xMunIni>CURITIBA</xMunIni><UFIni>PR</UFIni>
+<cMunFim>3550308</cMunFim><xMunFim>SAO PAULO</xMunFim><UFFim>SP</UFFim>
+<retira>1</retira><indIEToma>1</indIEToma>
+<toma4><toma>4</toma><CNPJ>11222333000181</CNPJ><IE>9999999990</IE>
+<xNome>ATACADISTA PONTO CARDEAL LTDA ME</xNome><fone>9999999990</fone>
+<enderToma><xLgr>AVENIDA DOS IPES</xLgr><nro>100</nro><xBairro>VILA UNIAO</xBairro>
+<cMun>4106902</cMun><xMun>CURITIBA</xMun><CEP>99999990</CEP><UF>PR</UF>
+<cPais>1058</cPais><xPais>BRASIL</xPais></enderToma></toma4></ide>
+<compl><xCaracAd>CARGA PALETIZADA</xCaracAd><xCaracSer>ENTREGA AGENDADA</xCaracSer>
+<fluxo><xOrig>CWB</xOrig><pass><xPass>JVE</xPass></pass><pass><xPass>REG</xPass></pass><xDest>CPQ</xDest><xRota>R12</xRota></fluxo>
+<Entrega><comData><tpPer>2</tpPer><dProg>2026-09-19</dProg></comData><noInter><tpHor>4</tpHor><hIni>08:00:00</hIni><hFim>12:00:00</hFim></noInter></Entrega>
+<xObs>TEXTO DE AMOSTRA</xObs>
+<ObsCont xCampo="PEDIDO"><xTexto>PC-4471</xTexto></ObsCont>
+<ObsCont xCampo="COLETA"><xTexto>JANELA 07H-09H</xTexto></ObsCont>
+<ObsFisco xCampo="ICMS"><xTexto>ICMS RETIDO POR SUBSTITUICAO TRIBUTARIA</xTexto></ObsFisco></compl>
+<emit><CNPJ>12222333000144</CNPJ><IE>9999999990</IE>
+<xNome>INDUSTRIA E COMERCIO ZENITE SA</xNome><xFant>ANA PAULA MARTINS</xFant>
+<enderEmit><xLgr>TRAVESSA DO MIRANTE</xLgr><nro>2986</nro><xBairro>CENTRO</xBairro>
+<cMun>4106902</cMun><xMun>CURITIBA</xMun><CEP>99999990</CEP><UF>PR</UF>
+<fone>9999999990</fone></enderEmit><CRT>3</CRT></emit>
+<rem><CNPJ>13222333000107</CNPJ><IE>9999999990</IE>
+<xNome>ATACADISTA PONTO CARDEAL LTDA ME</xNome><fone>9999999990</fone>
+<enderReme><xLgr>ALAMEDA DAS PALMEIRAS</xLgr><nro>193</nro><xBairro>CENTRO</xBairro>
+<cMun>4302105</cMun><xMun>BENTO GONCALVES</xMun><CEP>99999990</CEP><UF>RS</UF>
+<cPais>1058</cPais><xPais>BRASIL</xPais></enderReme></rem><exped><CNPJ>14222333000170</CNPJ><IE>9999999990</IE>
+<xNome>TRANSPORTES QUADRANTE LTDA</xNome><fone>9999999990</fone>
+<enderExped><xLgr>RUA PROJETADA UM</xLgr><nro>KM 12</nro><xBairro>DISTRITO INDUSTRIAL</xBairro>
+<cMun>4209102</cMun><xMun>JOINVILLE</xMun><CEP>99999990</CEP><UF>SC</UF></enderExped></exped><receb><CNPJ>15222333000132</CNPJ><IE>999999999990</IE>
+<xNome>COMERCIO DE PECAS HORIZONTE LTDA EPP</xNome><fone>9999999990</fone>
+<enderReceb><xLgr>TRAVESSA DO MIRANTE</xLgr><nro>4400</nro><xBairro>VILA UNIAO</xBairro>
+<cMun>3509502</cMun><xMun>CAMPINAS</xMun><CEP>99999990</CEP><UF>SP</UF></enderReceb></receb><dest><CNPJ>16222333000103</CNPJ><IE>999999990</IE>
+<xNome>DISTRIBUIDORA VERTICE LTDA</xNome><fone>9999999990</fone><ISUF>210987654</ISUF>
+<enderDest><xLgr>TRAVESSA DO MIRANTE</xLgr><nro>SN</nro><xCpl>COMPLEMENTO</xCpl>
+<xBairro>JARDIM NOVO</xBairro><cMun>3550308</cMun><xMun>SAO PAULO</xMun>
+<CEP>99999990</CEP><UF>SP</UF><cPais>1058</cPais><xPais>BRASIL</xPais></enderDest></dest>
+<vPrest><vTPrest>2202.10</vTPrest><vRec>2202.10</vRec>
+<Comp><xNome>FRETE PESO</xNome><vComp>1850.00</vComp></Comp>
+<Comp><xNome>PEDAGIO</xNome><vComp>132.40</vComp></Comp>
+<Comp><xNome>GRIS</xNome><vComp>219.70</vComp></Comp></vPrest>
+<imp><ICMS><ICMS60><CST>60</CST><vBCSTRet>2202.10</vBCSTRet><vICMSSTRet>264.25</vICMSSTRet>
+<pICMSSTRet>12.00</pICMSSTRet></ICMS60></ICMS><vTotTrib>418.40</vTotTrib><IBSCBS><CST>000</CST><cClassTrib>000001</cClassTrib><gIBSCBS><vBC>2202.10</vBC>
+<gIBSUF><pIBSUF>0.1000</pIBSUF><vIBSUF>2.20</vIBSUF></gIBSUF>
+<gIBSMun><pIBSMun>0.0000</pIBSMun><vIBSMun>0.00</vIBSMun></gIBSMun><vIBS>2.20</vIBS>
+<gCBS><pCBS>0.9000</pCBS><vCBS>19.82</vCBS></gCBS></gIBSCBS></IBSCBS><vTotDFe>2224.12</vTotDFe></imp>
+<infCTeNorm><infCarga><vCarga>148320.55</vCarga><proPred>PNEUMATICOS</proPred><xOutCat>FRAGIL - NAO EMPILHAR</xOutCat>
+<infQ><cUnid>01</cUnid><tpMed>PESO BRUTO</tpMed><qCarga>8420.0000</qCarga></infQ>
+<infQ><cUnid>03</cUnid><tpMed>VOLUMES</tpMed><qCarga>184.0000</qCarga></infQ></infCarga>
+<infDoc><infNF><mod>04</mod><serie>1</serie><nDoc>812</nDoc><dEmi>2026-09-10</dEmi>
+<vBC>0.00</vBC><vICMS>0.00</vICMS><vBCST>0.00</vBCST><vST>0.00</vST><vProd>18450.00</vProd>
+<vNF>18450.00</vNF><nCFOP>6101</nCFOP><nPeso>2100.000</nPeso></infNF>
+<infNF><mod>01</mod><serie>2</serie><nDoc>4471</nDoc><dEmi>2026-09-11</dEmi>
+<vBC>9800.00</vBC><vICMS>1176.00</vICMS><vBCST>0.00</vBCST><vST>0.00</vST><vProd>9800.00</vProd>
+<vNF>9800.00</vNF><nCFOP>6102</nCFOP></infNF></infDoc><docAnt><emiDocAnt><CNPJ>17222333000168</CNPJ><IE>9999999990</IE><UF>SC</UF>
+<xNome>TRANSPORTES QUADRANTE LTDA</xNome>
+<idDocAnt><idDocAntPap><tpDoc>11</tpDoc><serie>1</serie><nDoc>15520</nDoc><dEmi>2026-09-12</dEmi></idDocAntPap></idDocAnt>
+<idDocAnt><idDocAntEle><chCTe>41260917222333000168570010000402211741141411</chCTe></idDocAntEle></idDocAnt>
+</emiDocAnt></docAnt><infModal versaoModal="4.00"><rodo><RNTRC>12345678</RNTRC><occ><serie>1</serie><nOcc>55821</nOcc><dEmi>2026-09-12</dEmi><emiOcc><CNPJ>13222333000107</CNPJ>
+<cInt>COL-7</cInt><IE>9999999990</IE><UF>RS</UF><fone>9999999990</fone></emiOcc></occ></rodo></infModal><cobr><fat><nFat>91724</nFat><vOrig>2202.10</vOrig><vDesc>0.00</vDesc><vLiq>2202.10</vLiq></fat>
+<dup><nDup>001</nDup><dVenc>2026-10-14</dVenc><vDup>1101.05</vDup></dup>
+<dup><nDup>002</nDup><dVenc>2026-11-13</dVenc><vDup>1101.05</vDup></dup></cobr></infCTeNorm>
+</infCte>
+<infCTeSupl><qrCodCTe>https://dfe-portal.svrs.rs.gov.br/cte/qrCode?chCTe=41260912222333000144570010000917241741146449&amp;tpAmb=1</qrCodCTe></infCTeSupl>
+</CTe>
+<protCTe versao="4.00"><infProt><tpAmb>1</tpAmb><verAplic>PR-v4_0_7</verAplic>
+<chCTe>41260912222333000144570010000917241741146449</chCTe><dhRecbto>2026-09-14T09:19:02-03:00</dhRecbto>
+<nProt>999999999999990</nProt><digVal>abc123</digVal><cStat>100</cStat>
+<xMotivo>TEXTO DE AMOSTRA</xMotivo></infProt></protCTe>
+</cteProc>

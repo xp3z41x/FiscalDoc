@@ -70,6 +70,21 @@ public sealed class MatrizQr
 /// </summary>
 public static class QrCode
 {
+    /// <summary>
+    /// Lado da caixa do QR Code impresso, margem clara inclusa.
+    ///
+    /// <para>Os dois manuais que pedem QR Code no papel pedem a mesma coisa:
+    /// "no minimo 25 x 25 mm, sendo 22 mm de conteudo para 3 mm de margem
+    /// segura" - o do DANFE NFC-e e o do DACTE (MOC CT-e 4.00, Anexo II,
+    /// 2.18.1). A caixa e maior que o minimo por causa da quantizacao: o
+    /// renderizador arredonda a largura do modulo <b>para baixo</b>, em pontos
+    /// inteiros do dispositivo, para nunca estourar a caixa - e a 300 dpi isso
+    /// custa ate um ponto por modulo. Com 34 mm, o simbolo impresso fica em
+    /// torno de 25 mm de conteudo mesmo depois da perda, e continua acima dos
+    /// 22 mm que os manuais pedem.</para>
+    /// </summary>
+    public const float LadoCaixaImpressaMm = 34f;
+
     /// <summary>Indicador de modo binario (byte), 4 bits.</summary>
     private const int ModoBinario = 0b0100;
 
