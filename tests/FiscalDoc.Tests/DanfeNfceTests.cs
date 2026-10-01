@@ -312,13 +312,31 @@ public sealed class DanfeNfceTests
         Assert.Contains("CHAVE DE ACESSO", TextoCorrido(c), StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Divisao VI: "CONSUMIDOR CPF:" com o numero na mascara, ou a redacao do
+    /// manual para o consumidor nao identificado.
+    ///
+    /// <para>O CPF esperado sai do proprio arquivo, e a mascara e aplicada
+    /// aqui, sem passar por <c>Formatos</c>. E o CPF de uma pessoa de verdade:
+    /// escrito no teste, ele ia junto para o repositorio publico - e foi o que
+    /// aconteceu ate a versao 1.1.</para>
+    /// </summary>
     [TeoriaComCorpusReal]
-    [InlineData("56096", "CONSUMIDOR CPF: 952.160.497-20")]
-    [InlineData("56098", TextosNfce.ConsumidorNaoIdentificado)]
+    [InlineData("56096", true)]
+    [InlineData("56098", false)]
     public void Divisao_vi_usa_a_redacao_do_manual_para_o_consumidor(
-        string amostra, string esperado)
+        string amostra, bool identificado)
     {
-        Assert.Contains(esperado, TextoCorrido(Montar(LerReal(amostra))), StringComparison.Ordinal);
+        NfeDocumento nfce = LerReal(amostra);
+
+        string esperado = TextosNfce.ConsumidorNaoIdentificado;
+        if (identificado)
+        {
+            string cpf = Assert.IsType<string>(nfce.Destinatario.Cpf);
+            esperado = $"CONSUMIDOR CPF: {cpf[..3]}.{cpf[3..6]}.{cpf[6..9]}-{cpf[9..]}";
+        }
+
+        Assert.Contains(esperado, TextoCorrido(Montar(nfce)), StringComparison.Ordinal);
     }
 
     [Fact]
