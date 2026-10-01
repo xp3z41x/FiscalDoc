@@ -26,7 +26,7 @@ bloco `#ifdef Assinar` em `installer/FiscalDoc.iss`). Enquanto não há,
 cada release publica o SHA-256 do arquivo; confira antes de executar:
 
 ```
-Get-FileHash .\FiscalDoc-1.1-instalador.exe -Algorithm SHA256
+Get-FileHash .\FiscalDoc-1.2-instalador.exe -Algorithm SHA256
 ```
 
 ## Requisito

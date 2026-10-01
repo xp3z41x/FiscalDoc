@@ -47,7 +47,7 @@
 ; MANTER EM DIA COM <Version> em Directory.Build.props.  Sao duas fontes para
 ; o mesmo numero; divergem no dia em que alguem sobe uma e esquece a outra, e
 ; ai o instalador mente sobre o que instala.
-#define AppVersion     "1.1"
+#define AppVersion     "1.2"
 #define AppPublisher   "Bernardo Graunke"
 #define AppExe         "FiscalDoc.exe"
 #define RepoUrl        "https://github.com/xp3z41x/FiscalDoc"
